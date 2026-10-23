@@ -2,87 +2,138 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#101010">
-  <title>KenyaTik 🇰🇪</title>
-  <style>
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      background: #101010;
-      color: white;
-      font-family: Arial, sans-serif;
-    }
-    header {
-      background: #191919;
-      padding: 18px;
-      text-align: center;
-      border-bottom: 2px solid #45e6a5;
-    }
-    h1 { color: #45e6a5; margin: 0; }
-    main {
-      max-width: 500px;
-      margin: auto;
-      padding: 16px;
-    }
-    .card {
-      background: #222;
-      border-radius: 14px;
-      padding: 16px;
-      margin: 18px 0;
-    }
-    button {
-      width: 100%;
-      padding: 13px;
-      margin-top: 10px;
-      background: #45e6a5;
-      color: #101010;
-      border: 0;
-      border-radius: 8px;
-      font-size: 16px;
-      font-weight: bold;
-    }
-    .muted { color: #bbb; }
-    footer {
-      text-align: center;
-      padding: 20px;
-      color: #aaa;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#101010">
+<title>KenyaTik 🇰🇪</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#101010;color:white;font-family:Arial,sans-serif}
+header{height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;background:#111}
+.logo{font-size:23px;font-weight:bold;color:#45e6a5}
+header button{width:auto;margin:0;padding:8px 12px}
+button{border:0;cursor:pointer;font-size:15px;font-weight:bold}
+.feed{height:calc(100dvh - 108px);overflow-y:auto;scroll-snap-type:y mandatory}
+.video-card{height:100%;min-height:350px;position:relative;scroll-snap-align:start;background:#222;overflow:hidden}
+video{width:100%;height:100%;object-fit:contain;background:#080808}
+.overlay{position:absolute;inset:auto 0 0;padding:50px 90px 22px 16px;background:linear-gradient(transparent,rgba(0,0,0,.85));pointer-events:none}
+.overlay h3{margin:0 0 8px}
+.overlay p{margin:5px 0}
+.actions{position:absolute;right:13px;bottom:60px;display:flex;flex-direction:column;gap:22px;align-items:center}
+.action{background:rgba(20,20,20,.7);color:white;border-radius:50%;width:48px;height:48px;font-size:23px}
+.count{font-size:12px;text-align:center;margin-top:4px}
+.bottom{height:54px;display:flex;justify-content:space-around;align-items:center;background:#151515}
+.bottom button{background:none;color:white;padding:8px 10px}
+.bottom .active{color:#45e6a5}
+.notice{padding:10px;text-align:center;background:#202020;color:#45e6a5;font-size:13px}
+</style>
 </head>
 <body>
-  <header>
-    <h1>🇰🇪 KenyaTik</h1>
-    <p>Kenyan videos. Kenyan voices.</p>
-  </header>
+<header>
+  <div class="logo">🇰🇪 KenyaTik</div>
+  <button onclick="alert('Video uploads will be added in a later version.')">＋ Upload</button>
+</header>
 
-  <main>
-    <section class="card">
-      <h2>Karibu KenyaTik!</h2>
-      <p>Discover the next generation of Kenyan creators.</p>
-      <p class="muted">Comedy · Music · Dance · News · Lifestyle</p>
-    </section>
+<div class="notice">Kenyan videos. Kenyan voices.</div>
 
-    <section class="card">
-      <h2>🎬 Your video community</h2>
-      <p>Short videos from Kenya, all in one place.</p>
-      <button onclick="alert('Video uploads are coming soon!')">
-        ＋ Upload a video
-      </button>
-    </section>
+<main class="feed" id="feed">
+  <section class="video-card">
+    <video controls playsinline loop preload="metadata"
+      poster="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.jpg">
+      <source src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4" type="video/mp4">
+      Your browser cannot play this video.
+    </video>
+    <div class="overlay">
+      <h3>@KenyaTik 🇰🇪</h3>
+      <p>🌸 Enjoy the little things in life!</p>
+      <p>#KenyaTik #Lifestyle</p>
+    </div>
+    <div class="actions">
+      <div><button class="action like" aria-label="Like video" onclick="like(this)">♡</button><div class="count"> <span>0</span> likes</div></div>
+      <div><button class="action" onclick="share(this)" aria-label="Share video">↗</button><div class="count">Share</div></div>
+      <div><button class="action" onclick="toggleSound(this)" aria-label="Toggle sound">🔇</button><div class="count">Sound</div></div>
+    </div>
+  </section>
 
-    <section class="card">
-      <h2>❤️ Join the community</h2>
-      <p>Create your account and connect with Kenyan creators.</p>
-      <button onclick="alert('Account registration is coming soon!')">
-        Get Started
-      </button>
-    </section>
-  </main>
+  <section class="video-card">
+    <video controls playsinline loop preload="metadata">
+      <source src="https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4" type="video/mp4">
+    </video>
+    <div class="overlay">
+      <h3>@TravelVibes</h3>
+      <p>🌍 Explore the world, one day at a time.</p>
+      <p>#Travel #KenyaTik</p>
+    </div>
+    <div class="actions">
+      <div><button class="action like" aria-label="Like video" onclick="like(this)">♡</button><div class="count"><span>0</span> likes</div></div>
+      <div><button class="action" onclick="share(this)" aria-label="Share video">↗</button><div class="count">Share</div></div>
+      <div><button class="action" onclick="toggleSound(this)" aria-label="Toggle sound">🔇</button><div class="count">Sound</div></div>
+    </div>
+  </section>
 
-  <footer>
-    Made for Kenya 🇰🇪
-  </footer>
+  <section class="video-card">
+    <video controls playsinline loop preload="metadata">
+      <source src="https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4" type="video/mp4">
+    </video>
+    <div class="overlay">
+      <h3>@FunZone</h3>
+      <p>😎 Time to relax and have some fun!</p>
+      <p>#Entertainment #KenyaTik</p>
+    </div>
+    <div class="actions">
+      <div><button class="action like" aria-label="Like video" onclick="like(this)">♡</button><div class="count"><span>0</span> likes</div></div>
+      <div><button class="action" onclick="share(this)" aria-label="Share video">↗</button><div class="count">Share</div></div>
+      <div><button class="action" onclick="toggleSound(this)" aria-label="Toggle sound">🔇</button><div class="count">Sound</div></div>
+    </div>
+  </section>
+</main>
+
+<nav class="bottom">
+  <button class="active" onclick="goHome()">🏠 Home</button>
+  <button onclick="alert('Discover is coming soon.')">🔎 Discover</button>
+  <button onclick="alert('Profiles are coming soon.')">👤 Profile</button>
+</nav>
+
+<script>
+function like(button){
+  const count=button.parentElement.querySelector('.count span');
+  const liked=button.dataset.liked==='yes';
+  const n=Number(count.textContent);
+  count.textContent=liked?Math.max(0,n-1):n+1;
+  button.dataset.liked=liked?'no':'yes';
+  button.textContent=liked?'♡':'♥';
+  button.style.color=liked?'white':'#ff4d79';
+}
+function toggleSound(button){
+  const video=button.closest('.video-card').querySelector('video');
+  video.muted=!video.muted;
+  button.textContent=video.muted?'🔇':'🔊';
+}
+async function share(button){
+  const card=button.closest('.video-card');
+  const title=card.querySelector('.overlay h3').textContent;
+  const data={title:'KenyaTik video',text:title+' on KenyaTik',url:location.href};
+  try{
+    if(navigator.share) await navigator.share(data);
+    else if(navigator.clipboard){
+      await navigator.clipboard.writeText(location.href);
+      alert('Website link copied!');
+    }else alert('Copy your KenyaTik website link from the browser.');
+  }catch(e){}
+}
+function goHome(){
+  document.getElementById('feed').scrollTo({top:0,behavior:'smooth'});
+}
+const videos=document.querySelectorAll('video');
+const observer=new IntersectionObserver(entries=>{
+  entries.forEach(entry=>{
+    const video=entry.target;
+    if(entry.isIntersecting){
+      videos.forEach(other=>{if(other!==video)other.pause()});
+    }else video.pause();
+  });
+},{threshold:0.7});
+videos.forEach(video=>observer.observe(video));
+</script>
 </body>
 </html>
