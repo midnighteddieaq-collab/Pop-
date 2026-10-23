@@ -3,137 +3,471 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#101010">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#080808">
 <title>KenyaTik 🇰🇪</title>
+
 <style>
-*{box-sizing:border-box}
-body{margin:0;background:#101010;color:white;font-family:Arial,sans-serif}
-header{height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;background:#111}
-.logo{font-size:23px;font-weight:bold;color:#45e6a5}
-header button{width:auto;margin:0;padding:8px 12px}
-button{border:0;cursor:pointer;font-size:15px;font-weight:bold}
-.feed{height:calc(100dvh - 108px);overflow-y:auto;scroll-snap-type:y mandatory}
-.video-card{height:100%;min-height:350px;position:relative;scroll-snap-align:start;background:#222;overflow:hidden}
-video{width:100%;height:100%;object-fit:contain;background:#080808}
-.overlay{position:absolute;inset:auto 0 0;padding:50px 90px 22px 16px;background:linear-gradient(transparent,rgba(0,0,0,.85));pointer-events:none}
-.overlay h3{margin:0 0 8px}
-.overlay p{margin:5px 0}
-.actions{position:absolute;right:13px;bottom:60px;display:flex;flex-direction:column;gap:22px;align-items:center}
-.action{background:rgba(20,20,20,.7);color:white;border-radius:50%;width:48px;height:48px;font-size:23px}
-.count{font-size:12px;text-align:center;margin-top:4px}
-.bottom{height:54px;display:flex;justify-content:space-around;align-items:center;background:#151515}
-.bottom button{background:none;color:white;padding:8px 10px}
-.bottom .active{color:#45e6a5}
-.notice{padding:10px;text-align:center;background:#202020;color:#45e6a5;font-size:13px}
+* { box-sizing: border-box; }
+
+:root {
+  color-scheme: dark;
+  --pink: #ff3155;
+}
+
+body {
+  margin: 0;
+  background: #000;
+  color: white;
+  font-family: Arial, sans-serif;
+}
+
+.topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  padding: max(14px, env(safe-area-inset-top)) 14px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(#000b, transparent);
+}
+
+.brand {
+  font-size: 23px;
+  font-weight: 800;
+}
+
+.brand span { color: var(--pink); }
+
+.tabs {
+  display: flex;
+  gap: 17px;
+  font-size: 14px;
+}
+
+.tabs button {
+  padding: 5px 0;
+  background: none;
+  border: 0;
+  color: #bbb;
+  font-size: 14px;
+}
+
+.tabs button.active {
+  color: white;
+  font-weight: bold;
+  border-bottom: 2px solid var(--pink);
+}
+
+.feed {
+  height: 100vh;
+  height: 100dvh;
+  overflow-y: auto;
+  scroll-snap-type: y mandatory;
+  overscroll-behavior-y: contain;
+  scrollbar-width: none;
+}
+
+.feed::-webkit-scrollbar { display: none; }
+
+.post {
+  height: 100vh;
+  height: 100dvh;
+  min-height: 450px;
+  position: relative;
+  overflow: hidden;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  background: #151515;
+}
+
+.post video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: #151515;
+}
+
+.shade {
+  position: absolute;
+  inset: 35% 0 0;
+  background: linear-gradient(
+    transparent,
+    #0004 35%,
+    #000d
+  );
+  pointer-events: none;
+}
+
+.video-hint {
+  position: absolute;
+  top: 20%;
+  left: 0;
+  right: 0;
+  text-align: center;
+  color: #fff;
+  font-size: 14px;
+  text-shadow: 0 1px 5px #000;
+  pointer-events: none;
+}
+
+.details {
+  position: absolute;
+  left: 14px;
+  right: 78px;
+  bottom: 83px;
+  z-index: 2;
+  text-shadow: 0 1px 4px #000;
+}
+
+.details h3 {
+  font-size: 16px;
+  margin: 0 0 9px;
+}
+
+.details p {
+  font-size: 14px;
+  line-height: 1.45;
+  margin: 6px 0;
+}
+
+.actions {
+  position: absolute;
+  right: 12px;
+  bottom: 115px;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 17px;
+}
+
+.action {
+  text-align: center;
+  font-size: 12px;
+  text-shadow: 0 1px 4px #000;
+}
+
+.action button {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 0;
+  color: white;
+  background: #242424b8;
+  font-size: 25px;
+  cursor: pointer;
+}
+
+.action button.liked { color: var(--pink); }
+
+.count {
+  margin-top: 4px;
+  min-height: 14px;
+}
+
+.progress {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 65px;
+  height: 3px;
+  z-index: 4;
+  background: #ffffff45;
+}
+
+.progress-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--pink);
+}
+
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: calc(58px + env(safe-area-inset-bottom));
+  padding: 7px 4px env(safe-area-inset-bottom);
+  z-index: 9;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background: #080808f5;
+  border-top: 1px solid #292929;
+}
+
+.bottom-nav button {
+  border: 0;
+  background: none;
+  color: #ddd;
+  font-size: 11px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: center;
+}
+
+.bottom-nav .nav-icon { font-size: 20px; }
+.bottom-nav .selected { color: var(--pink); }
+
+@media (min-width: 600px) {
+  .post { max-width: 480px; margin: auto; }
+  .topbar { left: 50%; transform: translateX(-50%); max-width: 480px; }
+  .bottom-nav { left: 50%; transform: translateX(-50%); max-width: 480px; }
+}
 </style>
 </head>
+
 <body>
-<header>
-  <div class="logo">🇰🇪 KenyaTik</div>
-  <button onclick="alert('Video uploads will be added in a later version.')">＋ Upload</button>
+<header class="topbar">
+  <div class="brand">Kenya<span>Tik</span> 🇰🇪</div>
+  <nav class="tabs" aria-label="Video feed">
+    <button type="button">Following</button>
+    <button type="button" class="active">For You</button>
+  </nav>
 </header>
 
-<div class="notice">Kenyan videos. Kenyan voices.</div>
-
 <main class="feed" id="feed">
-  <section class="video-card">
-    <video controls playsinline loop preload="metadata"
-      poster="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.jpg">
-      <source src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4" type="video/mp4">
-      Your browser cannot play this video.
-    </video>
-    <div class="overlay">
-      <h3>@KenyaTik 🇰🇪</h3>
-      <p>🌸 Enjoy the little things in life!</p>
-      <p>#KenyaTik #Lifestyle</p>
-    </div>
-    <div class="actions">
-      <div><button class="action like" aria-label="Like video" onclick="like(this)">♡</button><div class="count"> <span>0</span> likes</div></div>
-      <div><button class="action" onclick="share(this)" aria-label="Share video">↗</button><div class="count">Share</div></div>
-      <div><button class="action" onclick="toggleSound(this)" aria-label="Toggle sound">🔇</button><div class="count">Sound</div></div>
-    </div>
-  </section>
 
-  <section class="video-card">
-    <video controls playsinline loop preload="metadata">
-      <source src="https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4" type="video/mp4">
-    </video>
-    <div class="overlay">
-      <h3>@TravelVibes</h3>
-      <p>🌍 Explore the world, one day at a time.</p>
-      <p>#Travel #KenyaTik</p>
+  <article class="post">
+    <video
+      src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
+      loop muted playsinline preload="metadata"
+      aria-label="Flower video"></video>
+    <div class="shade"></div>
+    <div class="video-hint">Tap video to play or pause</div>
+    <div class="details">
+      <h3>@KenyaTik</h3>
+      <p>Welcome to KenyaTik! 🇰🇪 Discover something beautiful today.</p>
+      <p>#KenyaTik #ForYou #Discover</p>
     </div>
     <div class="actions">
-      <div><button class="action like" aria-label="Like video" onclick="like(this)">♡</button><div class="count"><span>0</span> likes</div></div>
-      <div><button class="action" onclick="share(this)" aria-label="Share video">↗</button><div class="count">Share</div></div>
-      <div><button class="action" onclick="toggleSound(this)" aria-label="Toggle sound">🔇</button><div class="count">Sound</div></div>
+      <div class="action">
+        <button type="button" class="like" aria-label="Like video">♡</button>
+        <div class="count">0 likes</div>
+      </div>
+      <div class="action">
+        <button type="button" class="sound" aria-label="Turn sound on">🔇</button>
+        <div class="count">Sound</div>
+      </div>
+      <div class="action">
+        <button type="button" class="share" aria-label="Share video">↗</button>
+        <div class="count">Share</div>
+      </div>
     </div>
-  </section>
+    <div class="progress"><div class="progress-fill"></div></div>
+  </article>
 
-  <section class="video-card">
-    <video controls playsinline loop preload="metadata">
-      <source src="https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4" type="video/mp4">
-    </video>
-    <div class="overlay">
-      <h3>@FunZone</h3>
-      <p>😎 Time to relax and have some fun!</p>
-      <p>#Entertainment #KenyaTik</p>
+  <article class="post">
+    <video
+      src="https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4"
+      loop muted playsinline preload="metadata"
+      aria-label="Sample entertainment video"></video>
+    <div class="shade"></div>
+    <div class="video-hint">Tap video to play or pause</div>
+    <div class="details">
+      <h3>@Discover</h3>
+      <p>Your next favourite video starts here. 🎬</p>
+      <p>#KenyaTik #Entertainment #ForYou</p>
     </div>
     <div class="actions">
-      <div><button class="action like" aria-label="Like video" onclick="like(this)">♡</button><div class="count"><span>0</span> likes</div></div>
-      <div><button class="action" onclick="share(this)" aria-label="Share video">↗</button><div class="count">Share</div></div>
-      <div><button class="action" onclick="toggleSound(this)" aria-label="Toggle sound">🔇</button><div class="count">Sound</div></div>
+      <div class="action">
+        <button type="button" class="like" aria-label="Like video">♡</button>
+        <div class="count">0 likes</div>
+      </div>
+      <div class="action">
+        <button type="button" class="sound" aria-label="Turn sound on">🔇</button>
+        <div class="count">Sound</div>
+      </div>
+      <div class="action">
+        <button type="button" class="share" aria-label="Share video">↗</button>
+        <div class="count">Share</div>
+      </div>
     </div>
-  </section>
+    <div class="progress"><div class="progress-fill"></div></div>
+  </article>
+
+  <article class="post">
+    <video
+      src="https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4"
+      loop muted playsinline preload="metadata"
+      aria-label="Sample fun video"></video>
+    <div class="shade"></div>
+    <div class="video-hint">Tap video to play or pause</div>
+    <div class="details">
+      <h3>@KenyaCreators</h3>
+      <p>Every creator starts somewhere. Share your talent! 🔥</p>
+      <p>#MadeInKenya #KenyaTik</p>
+    </div>
+    <div class="actions">
+      <div class="action">
+        <button type="button" class="like" aria-label="Like video">♡</button>
+        <div class="count">0 likes</div>
+      </div>
+      <div class="action">
+        <button type="button" class="sound" aria-label="Turn sound on">🔇</button>
+        <div class="count">Sound</div>
+      </div>
+      <div class="action">
+        <button type="button" class="share" aria-label="Share video">↗</button>
+        <div class="count">Share</div>
+      </div>
+    </div>
+    <div class="progress"><div class="progress-fill"></div></div>
+  </article>
+
 </main>
 
-<nav class="bottom">
-  <button class="active" onclick="goHome()">🏠 Home</button>
-  <button onclick="alert('Discover is coming soon.')">🔎 Discover</button>
-  <button onclick="alert('Profiles are coming soon.')">👤 Profile</button>
+<nav class="bottom-nav" aria-label="Main navigation">
+  <button type="button" class="selected" data-nav="Home">
+    <span class="nav-icon">⌂</span>Home
+  </button>
+  <button type="button" data-nav="Discover">
+    <span class="nav-icon">⌕</span>Discover
+  </button>
+  <button type="button" data-nav="Create">
+    <span class="nav-icon">＋</span>Create
+  </button>
+  <button type="button" data-nav="Inbox">
+    <span class="nav-icon">♡</span>Inbox
+  </button>
+  <button type="button" data-nav="Profile">
+    <span class="nav-icon">♙</span>Profile
+  </button>
 </nav>
 
 <script>
-function like(button){
-  const count=button.parentElement.querySelector('.count span');
-  const liked=button.dataset.liked==='yes';
-  const n=Number(count.textContent);
-  count.textContent=liked?Math.max(0,n-1):n+1;
-  button.dataset.liked=liked?'no':'yes';
-  button.textContent=liked?'♡':'♥';
-  button.style.color=liked?'white':'#ff4d79';
+const videos = [...document.querySelectorAll(".post video")];
+let activeVideo = null;
+
+function playVideo(video) {
+  if (activeVideo && activeVideo !== video) {
+    activeVideo.pause();
+  }
+  activeVideo = video;
+  video.play().catch(() => {});
 }
-function toggleSound(button){
-  const video=button.closest('.video-card').querySelector('video');
-  video.muted=!video.muted;
-  button.textContent=video.muted?'🔇':'🔊';
-}
-async function share(button){
-  const card=button.closest('.video-card');
-  const title=card.querySelector('.overlay h3').textContent;
-  const data={title:'KenyaTik video',text:title+' on KenyaTik',url:location.href};
-  try{
-    if(navigator.share) await navigator.share(data);
-    else if(navigator.clipboard){
-      await navigator.clipboard.writeText(location.href);
-      alert('Website link copied!');
-    }else alert('Copy your KenyaTik website link from the browser.');
-  }catch(e){}
-}
-function goHome(){
-  document.getElementById('feed').scrollTo({top:0,behavior:'smooth'});
-}
-const videos=document.querySelectorAll('video');
-const observer=new IntersectionObserver(entries=>{
-  entries.forEach(entry=>{
-    const video=entry.target;
-    if(entry.isIntersecting){
-      videos.forEach(other=>{if(other!==video)other.pause()});
-    }else video.pause();
+
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    const video = entry.target.querySelector("video");
+    if (!video) return;
+
+    if (entry.isIntersecting && entry.intersectionRatio >= 0.65) {
+      playVideo(video);
+    } else {
+      video.pause();
+    }
   });
-},{threshold:0.7});
-videos.forEach(video=>observer.observe(video));
+}, { threshold: [0, 0.65, 1] });
+
+document.querySelectorAll(".post").forEach(post => {
+  observer.observe(post);
+
+  const video = post.querySelector("video");
+  const fill = post.querySelector(".progress-fill");
+  const hint = post.querySelector(".video-hint");
+  let lastTap = 0;
+
+  video.addEventListener("timeupdate", () => {
+    if (video.duration && Number.isFinite(video.duration)) {
+      fill.style.width = (video.currentTime / video.duration * 100) + "%";
+    }
+  });
+
+  video.addEventListener("click", () => {
+    const now = Date.now();
+    if (now - lastTap < 300) {
+      const like = post.querySelector(".like");
+      if (!like.classList.contains("liked")) like.click();
+    } else if (video.paused) {
+      playVideo(video);
+    } else {
+      video.pause();
+    }
+    lastTap = now;
+  });
+
+  video.addEventListener("play", () => {
+    hint.textContent = "Tap video to pause";
+  });
+  video.addEventListener("pause", () => {
+    hint.textContent = "Tap video to play";
+  });
+
+  const like = post.querySelector(".like");
+  let liked = false;
+  let count = 0;
+
+  like.addEventListener("click", () => {
+    liked = !liked;
+    count += liked ? 1 : -1;
+    like.classList.toggle("liked", liked);
+    like.textContent = liked ? "♥" : "♡";
+    like.nextElementSibling.textContent = count + " likes";
+  });
+
+  const sound = post.querySelector(".sound");
+  sound.addEventListener("click", () => {
+    video.muted = !video.muted;
+    sound.textContent = video.muted ? "🔇" : "🔊";
+    sound.setAttribute(
+      "aria-label",
+      video.muted ? "Turn sound on" : "Mute video"
+    );
+  });
+
+  post.querySelector(".share").addEventListener("click", async () => {
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: "KenyaTik 🇰🇪",
+          text: post.querySelector(".details p").textContent,
+          url: location.href
+        });
+      } else if (navigator.clipboard) {
+        await navigator.clipboard.writeText(location.href);
+        alert("KenyaTik link copied!");
+      } else {
+        prompt("Copy your KenyaTik website link:", location.href);
+      }
+    } catch (error) {
+      // Sharing was cancelled or unavailable.
+    }
+  });
+});
+
+document.querySelectorAll(".tabs button").forEach(button => {
+  button.addEventListener("click", () => {
+    document.querySelectorAll(".tabs button").forEach(tab => {
+      tab.classList.toggle("active", tab === button);
+    });
+  });
+});
+
+document.querySelectorAll(".bottom-nav button").forEach(button => {
+  button.addEventListener("click", () => {
+    const name = button.dataset.nav;
+    if (name !== "Home") {
+      alert(name + " will be added in a future KenyaTik update.");
+      return;
+    }
+    document.querySelector(".feed").scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+    document.querySelectorAll(".bottom-nav button").forEach(nav => {
+      nav.classList.toggle("selected", nav === button);
+    });
+  });
+});
 </script>
 </body>
-</html>
+                              </html>
+                              
