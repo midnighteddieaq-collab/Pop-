@@ -450,34 +450,41 @@ document.querySelectorAll(".tabs button").forEach(button => {
     });
   });
 });
-
-document.querySelectorAll(".bottom-nav button").forEach(button => {
-  button.addEventListener("click", () => {
-    const name = button.dataset.nav;
-    if (name !== "Home") {
-      alert(name + " will be added in a future KenyaTik update.");
-      return;
-    }
-    document.querySelector(".feed").scrollTo({
-      top: 0,
+document.querySelectorAll(".bottom-nav button").forEach(button
+button.addEventListener("click", () => {
+  const name = button.dataset.nav
+    
+    if (name === "Create") {
+      const uploadPanel = document.getElementById("upload-panel")
+      
+    if (uploadPanel) {
+    uploadPanel.scrollIntoView({
       behavior: "smooth"
+      block: "start"
     });
-    document.querySelectorAll(".bottom-nav button").forEach(nav => {
-      nav.classList.toggle("selected", nav === button);
-    });
+    } else {
+      alert("Upload section not found.");
+    }
+  return;
+}
+
+  if (name !== "Home") {
+alert(name + " will be added in a future KenyaTik update.");
+return;
+}
+
+document.querySelector(".feed").scrollTo({
+  top: 0,
+  behavior: "smooth"
+  });
+  
+  document.querySelectorAll(".bottom-nav button").forEach(nav => {
+ nav.classList.toggle("selected", nav === button);
   });
 });
-</script>
-  
-<!-- KenyaTik video upload -->
-<section id="upload-panel" style="
-  background:#161616;
-  color:white;
-  padding:18px;
-  text-align:center;
-  font-family:Arial,sans-serif;
-">
-  <h2>Upload to KenyaTik</h2>
+  });
+  });
+  });
   <p>Choose a video from your phone.</p>
 
   <input
