@@ -467,7 +467,152 @@ document.querySelectorAll(".bottom-nav button").forEach(button => {
     });
   });
 });
+</scrip
+  
+<!-- KenyaTik video upload -->
+<section id="upload-panel" style="
+  background:#161616;
+  color:white;
+  padding:18px;
+  text-align:center;
+  font-family:Arial,sans-serif;
+">
+  <h2>Upload to KenyaTik</h2>
+  <p>Choose a video from your phone.</p>
+
+  <input
+    id="video-file"
+    type="file"
+    accept="video/mp4,video/webm,video/quicktime"
+    style="max-width:100%;margin:12px 0;"
+  />
+
+  <br>
+
+  <button
+    id="upload-button"
+    type="button"
+    style="
+      background:#ff2d55;
+      color:white;
+      border:0;
+      padding:12px 22px;
+      border-radius:24px;
+      font-weight:bold;
+    "
+  >
+    Upload Video
+  </button>
+
+  <p id="upload-status" role="status">
+    Ready to upload.
+  </p>
+</section>
+
+<script>
+(() => {
+  const CLOUD_NAME = "w3qirnhu";
+  const UPLOAD_PRESET = "kenyatik_videos";
+
+  const picker = document.getElementById("video-file");
+  const button = document.getElementById("upload-button");
+  const status = document.getElementById("upload-status");
+
+  button.addEventListener("click", async () => {
+    const file = picker.files[0];
+
+    if (!file) {
+      status.textContent = "Choose a video first.";
+      return;
+    }
+
+    if (!file.type.startsWith("video/")) {
+      status.textContent = "Please choose a video file.";
+      return;
+    }
+
+    // Prototype limit: 50 MB per video.
+    if (file.size > 50 * 1024 * 1024) {
+      status.textContent = "Video is too large. Choose one under 50 MB.";
+      return;
+    }
+
+    button.disabled = true;
+    status.textContent = "Uploading... Please wait.";
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("upload_preset", UPLOAD_PRESET);
+
+      const response = await fetch(
+        `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/video/upload`,
+        {
+          method: "POST",
+          body: formData
+        }
+      );
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          result.error?.message || "Upload failed."
+        );
+      }
+
+      addUploadedVideo(result.secure_url, file.name);
+
+      status.textContent = "Video uploaded successfully!";
+      picker.value = "";
+    } catch (error) {
+      status.textContent = "Upload error: " + error.message;
+    } finally {
+      button.disabled = false;
+    }
+  });
+
+  function addUploadedVideo(videoUrl, filename) {
+    const feed = document.querySelector(".feed");
+
+    if (!feed) {
+      status.textContent =
+        "Upload succeeded, but the feed container was not found.";
+      return;
+    }
+
+    const post = document.createElement("div");
+    post.className = "post";
+
+    const video = document.createElement("video");
+    video.src = videoUrl;
+    video.controls = true;
+    video.playsInline = true;
+    video.preload = "metadata";
+    video.style.width = "100%";
+    video.style.height = "100%";
+    video.style.objectFit = "contain";
+
+    const caption = document.createElement("p");
+    caption.textContent = filename;
+    caption.style.cssText =
+      "position:absolute;bottom:20px;left:12px;" +
+      "color:white;z-index:2;background:#0008;padding:8px;";
+
+    post.style.cssText =
+      "position:relative;min-height:75vh;background:#000;";
+
+    post.appendChild(video);
+    post.appendChild(caption);
+
+    feed.prepend(post);
+    post.scrollIntoView({ behavior: "smooth" });
+  }
+})();
 </script>
+</body>
+</html>
+t>
 </body>
                               </html>
                               
