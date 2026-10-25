@@ -3,116 +3,452 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>KenyaTik</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#000000">
+  <title>KenyaTik 🇰🇪</title>
+
   <style>
     * {
       box-sizing: border-box;
     }
 
-    body {
+    html, body {
       margin: 0;
-      background: #111;
-      color: white;
+      width: 100%;
+      height: 100%;
+      background: #000;
+      color: #fff;
       font-family: Arial, sans-serif;
+      overflow: hidden;
+    }
+
+    .app {
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
     }
 
     header {
-      position: sticky;
-      top: 0;
-      z-index: 10;
-      padding: 16px;
-      background: #181818;
-      text-align: center;
+      height: 54px;
+      flex-shrink: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 22px;
+      background: #080808;
+      z-index: 5;
+    }
+
+    header span {
+      color: #aaa;
+      font-weight: bold;
+    }
+
+    header .active {
+      color: white;
+      border-bottom: 3px solid #ff3155;
+      padding-bottom: 7px;
+    }
+
+    .feed {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      scroll-snap-type: y mandatory;
+      scrollbar-width: none;
+    }
+
+    .feed::-webkit-scrollbar {
+      display: none;
+    }
+
+    .video-card {
+      height: 100%;
+      min-height: 300px;
+      position: relative;
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
+      background: #151515;
+      overflow: hidden;
       border-bottom: 1px solid #333;
     }
 
-    header h1 {
-      margin: 0;
-      color: #ff3155;
+    .video-card video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      background: #151515;
     }
 
-    main {
-      max-width: 480px;
-      margin: auto;
-      padding: 20px 16px 90px;
+    .shade {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(
+        transparent 45%,
+        rgba(0,0,0,.15) 60%,
+        rgba(0,0,0,.85) 100%
+      );
     }
 
-    .welcome {
-      padding: 20px;
-      background: #202020;
-      border-radius: 14px;
-      text-align: center;
+    .video-info {
+      position: absolute;
+      left: 14px;
+      right: 82px;
+      bottom: 25px;
+      z-index: 2;
+      text-shadow: 0 1px 3px #000;
     }
 
-    .welcome h2 {
-      margin-top: 0;
+    .video-info h3 {
+      margin: 0 0 9px;
+      font-size: 17px;
     }
 
-    .status {
-      margin-top: 18px;
-      color: #aaa;
+    .video-info p {
+      margin: 0 0 8px;
+      line-height: 1.4;
       font-size: 14px;
     }
 
+    .actions {
+      position: absolute;
+      right: 12px;
+      bottom: 35px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      z-index: 3;
+    }
+
+    button {
+      color: white;
+      background: transparent;
+      border: 0;
+      cursor: pointer;
+      font: inherit;
+      touch-action: manipulation;
+    }
+
+    .action {
+      width: 52px;
+      min-height: 48px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      font-size: 12px;
+    }
+
+    .action .symbol {
+      font-size: 29px;
+      line-height: 1.1;
+      text-shadow: 0 1px 4px #000;
+    }
+
+    .action.liked .symbol {
+      color: #ff3155;
+    }
+
+    .play-hint {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      z-index: 2;
+      transform: translate(-50%, -50%);
+      font-size: 60px;
+      opacity: 0;
+      pointer-events: none;
+      text-shadow: 0 2px 8px #000;
+    }
+
+    .play-hint.show {
+      opacity: .9;
+    }
+
+    .notice {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      right: 12px;
+      text-align: center;
+      color: #fff;
+      background: rgba(0,0,0,.6);
+      border-radius: 8px;
+      padding: 8px;
+      font-size: 12px;
+      z-index: 4;
+    }
+
     nav {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
+      height: 58px;
+      flex-shrink: 0;
       display: flex;
       justify-content: space-around;
-      padding: 14px 4px;
-      background: #181818;
-      border-top: 1px solid #333;
+      align-items: center;
+      background: #080808;
+      border-top: 1px solid #292929;
+      z-index: 5;
     }
 
-    nav a {
-      color: white;
-      text-decoration: none;
-      font-size: 13px;
+    nav button {
+      color: #ddd;
+      font-size: 11px;
+      padding: 8px 5px;
     }
 
-    nav a:focus,
-    nav a:hover {
+    nav button:first-child {
       color: #ff3155;
+    }
+
+    @media (min-width: 600px) {
+      .app {
+        max-width: 480px;
+        margin: auto;
+        border-left: 1px solid #333;
+        border-right: 1px solid #333;
+      }
+
+      body {
+        background: #202020;
+      }
     }
   </style>
 </head>
+
 <body>
-  <header>
-    <h1>KenyaTik 🇰🇪</h1>
-  </header>
+  <div class="app">
+    <header>
+      <span>Following</span>
+      <span class="active">For You</span>
+    </header>
 
-  <main>
-    <section class="welcome">
-      <h2>Welcome to KenyaTik</h2>
-      <p>Your home for short videos from Kenya.</p>
-      <p>We are rebuilding the video feed.</p>
-    </section>
+    <main class="feed" id="feed">
 
-    <p class="status" id="status">
-      KenyaTik is running.
-    </p>
-  </main>
+      <article class="video-card">
+        <video
+          src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
+          loop
+          muted
+          playsinline
+          preload="metadata"
+        ></video>
 
-  <nav>
-    <a href="#home">Home</a>
-    <a href="#discover">Discover</a>
-    <a href="#create">Create</a>
-    <a href="#inbox">Inbox</a>
-    <a href="#profile">Profile</a>
-  </nav>
+        <div class="shade"></div>
+        <div class="play-hint">▶</div>
+        <div class="notice">Sample video · Tap the video to play or pause</div>
+
+        <div class="video-info">
+          <h3>@KenyaTik 🇰🇪</h3>
+          <p>Welcome to KenyaTik! Our first sample video feed. 🇰🇪</p>
+          <p>♪ Original sound · Sample clip</p>
+        </div>
+
+        <div class="actions">
+          <button class="action like-btn" aria-label="Like video">
+            <span class="symbol">♥</span>
+            <span class="like-count">0</span>
+          </button>
+          <button class="action sound-btn" aria-label="Turn sound on">
+            <span class="symbol">🔇</span>
+            <span>Sound</span>
+          </button>
+          <button class="action share-btn" aria-label="Share video">
+            <span class="symbol">↗</span>
+            <span>Share</span>
+          </button>
+        </div>
+      </article>
+
+      <article class="video-card">
+        <video
+          src="https://www.w3schools.com/html/mov_bbb.mp4"
+          loop
+          muted
+          playsinline
+          preload="metadata"
+        ></video>
+
+        <div class="shade"></div>
+        <div class="play-hint">▶</div>
+
+        <div class="video-info">
+          <h3>@KenyaTik Clips</h3>
+          <p>Sample clip number two. More Kenyan videos will come later.</p>
+          <p>♪ Sample sound</p>
+        </div>
+
+        <div class="actions">
+          <button class="action like-btn" aria-label="Like video">
+            <span class="symbol">♥</span>
+            <span class="like-count">0</span>
+          </button>
+          <button class="action sound-btn" aria-label="Turn sound on">
+            <span class="symbol">🔇</span>
+            <span>Sound</span>
+          </button>
+          <button class="action share-btn" aria-label="Share video">
+            <span class="symbol">↗</span>
+            <span>Share</span>
+          </button>
+        </div>
+      </article>
+
+    </main>
+
+    <nav>
+      <button type="button">⌂<br>Home</button>
+      <button type="button" id="discover">⌕<br>Discover</button>
+      <button type="button" id="create">＋<br>Create</button>
+      <button type="button" id="inbox">✉<br>Inbox</button>
+      <button type="button" id="profile">♙<br>Profile</button>
+    </nav>
+  </div>
 
   <script>
     "use strict";
 
     document.addEventListener("DOMContentLoaded", function () {
-      const status = document.getElementById("status");
+      const cards = document.querySelectorAll(".video-card");
 
-      if (status) {
-        status.textContent = "KenyaTik is running successfully.";
-      }
+      cards.forEach(function (card) {
+        const video = card.querySelector("video");
+        const playHint = card.querySelector(".play-hint");
+        const likeButton = card.querySelector(".like-btn");
+        const likeCount = card.querySelector(".like-count");
+        const soundButton = card.querySelector(".sound-btn");
+        const soundSymbol = soundButton.querySelector(".symbol");
+        const shareButton = card.querySelector(".share-btn");
+
+        let liked = false;
+        let likes = 0;
+
+        // Start videos muted. Browsers may block autoplay.
+        const playPromise = video.play();
+
+        if (playPromise && typeof playPromise.catch === "function") {
+          playPromise.catch(function () {
+            playHint.classList.add("show");
+          });
+        }
+
+        // Tap the video area to play or pause.
+        video.addEventListener("click", function () {
+          if (video.paused) {
+            video.play().then(function () {
+              playHint.classList.remove("show");
+            }).catch(function () {
+              playHint.classList.add("show");
+            });
+          } else {
+            video.pause();
+            playHint.classList.add("show");
+          }
+        });
+
+        // Like and unlike.
+        likeButton.addEventListener("click", function () {
+          liked = !liked;
+          likes += liked ? 1 : -1;
+          likeCount.textContent = String(likes);
+          likeButton.classList.toggle("liked", liked);
+          likeButton.setAttribute(
+            "aria-pressed",
+            liked ? "true" : "false"
+          );
+        });
+
+        // Toggle sound for the selected video.
+        soundButton.addEventListener("click", function () {
+          video.muted = !video.muted;
+          soundSymbol.textContent = video.muted ? "🔇" : "🔊";
+          soundButton.setAttribute(
+            "aria-label",
+            video.muted ? "Turn sound on" : "Mute video"
+          );
+
+          if (!video.muted && video.paused) {
+            video.play().catch(function () {
+              playHint.classList.add("show");
+            });
+          }
+        });
+
+        // Share the current page when supported.
+        shareButton.addEventListener("click", async function () {
+          const shareData = {
+            title: "KenyaTik",
+            text: "Watch videos on KenyaTik!",
+            url: window.location.href
+          };
+
+          try {
+            if (navigator.share) {
+              await navigator.share(shareData);
+            } else if (navigator.clipboard) {
+              await navigator.clipboard.writeText(shareData.url);
+              shareButton.querySelector("span:last-child").textContent =
+                "Copied!";
+            } else {
+              window.prompt("Copy this website link:", shareData.url);
+            }
+          } catch (error) {
+            // Sharing was cancelled or is unavailable.
+          }
+        });
+      });
+
+      // Play only the video most visible on screen.
+      const observer = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          const video = entry.target.querySelector("video");
+          const hint = entry.target.querySelector(".play-hint");
+
+          if (entry.isIntersecting && entry.intersectionRatio >= 0.65) {
+            document.querySelectorAll(".video-card video").forEach(
+              function (otherVideo) {
+                if (otherVideo !== video) {
+                  otherVideo.pause();
+                }
+              }
+            );
+
+            video.play().then(function () {
+              hint.classList.remove("show");
+            }).catch(function () {
+              hint.classList.add("show");
+            });
+          } else {
+            video.pause();
+          }
+        });
+      }, {
+        threshold: [0, 0.65, 1]
+      });
+
+      cards.forEach(function (card) {
+        observer.observe(card);
+      });
+
+      document.getElementById("create").addEventListener("click", function () {
+        alert("Video uploading will be added in the next update.");
+      });
+
+      document.getElementById("discover").addEventListener("click", function () {
+        alert("Discover will be added in a future update.");
+      });
+
+      document.getElementById("inbox").addEventListener("click", function () {
+        alert("Inbox will be added in a future update.");
+      });
+
+      document.getElementById("profile").addEventListener("click", function () {
+        alert("Profiles will be added in a future update.");
+      });
     });
   </script>
 </body>
