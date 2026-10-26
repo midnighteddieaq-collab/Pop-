@@ -1,10 +1,13 @@
 
 <!DOCTYPE html>
-<html lang="en"><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>6
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>KenyaTik 🇰🇪</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
 *{box-sizing:border-box}
 body{margin:0;background:#080808;color:white;font-family:Arial,sans-serif}
@@ -30,8 +33,13 @@ nav button{font-size:12px;padding:5px}
 nav button.selected{color:#ff3155}
 #preview{width:100%;max-height:300px;margin-top:12px}
 .muted{color:#bbb;font-size:14px}
+#kt-account{background:#171717;color:white;padding:20px;margin:16px 16px 90px;border-radius:16px}
+#kt-account button{cursor:pointer}
+#kt-account .account-button{padding:12px;border:0;border-radius:8px;margin:5px 3px 5px 0}
+#kt-status{overflow-wrap:anywhere;line-height:1.5}
 </style>
 </head>
+
 <body>
 <header><b>KenyaTik 🇰🇪</b></header>
 
@@ -43,16 +51,27 @@ nav button.selected{color:#ff3155}
 <main>
 <section id="homePage" class="page active" style="padding:0">
 <div id="feed">
+
 <article class="video-card" data-caption="Welcome to KenyaTik! Our first sample video.">
 <video src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4" muted loop playsinline></video>
 <div class="info"><b>@KenyaTik</b><p>Welcome to KenyaTik 🇰🇪</p><span>♪ Sample sound</span></div>
-<div class="actions"><button onclick="toggleLike(this)">♥ <span>0</span></button><button onclick="toggleSound(this)">🔇 Sound</button><button onclick="sharePage()">↗ Share</button></div>
+<div class="actions">
+<button onclick="toggleLike(this)">♥ <span>0</span></button>
+<button onclick="toggleSound(this)">🔇 Sound</button>
+<button onclick="sharePage()">↗ Share</button>
+</div>
 </article>
+
 <article class="video-card" data-caption="Enjoy this sample clip. More videos coming soon.">
 <video src="https://www.w3schools.com/html/mov_bbb.mp4" muted loop playsinline></video>
 <div class="info"><b>@KenyaTik Clips</b><p>Enjoy this sample clip 🇰🇪</p><span>♪ Sample sound</span></div>
-<div class="actions"><button onclick="toggleLike(this)">♥ <span>0</span></button><button onclick="toggleSound(this)">🔇 Sound</button><button onclick="sharePage()">↗ Share</button></div>
+<div class="actions">
+<button onclick="toggleLike(this)">♥ <span>0</span></button>
+<button onclick="toggleSound(this)">🔇 Sound</button>
+<button onclick="sharePage()">↗ Share</button>
+</div>
 </article>
+
 </div>
 </section>
 
@@ -65,7 +84,7 @@ nav button.selected{color:#ff3155}
 
 <section id="createPage" class="page">
 <h2>Create a video</h2>
-<p class="muted">Choose a video from your phone. Cloudinary upload will be connected next.</p>
+<p class="muted">Choose a video from your phone to preview it.</p>
 <input id="videoFile" type="file" accept="video/*">
 <input id="videoCaption" maxlength="180" placeholder="Write a caption...">
 <video id="preview" controls playsinline style="display:none"></video>
@@ -83,8 +102,8 @@ nav button.selected{color:#ff3155}
 <h2>Your Profile</h2>
 <div class="tile">
 <h3>👤 @KenyaTikUser</h3>
-<p id="profileCount">2 sample videos in the feed</p>
-<p class="muted">Your uploaded videos and account settings will appear here later.</p>
+<p>2 sample videos in the feed</p>
+<p class="muted">Your account details are shown in the account panel below.</p>
 </div>
 </section>
 </main>
@@ -97,55 +116,85 @@ nav button.selected{color:#ff3155}
 <button data-page="profilePage" onclick="openPage('profilePage',this)">♙<br>Profile</button>
 </nav>
 
+<section id="kt-account">
+<h2 style="color:#45e6a5">🇰🇪 KenyaTik Account</h2>
+<p>Create an account or sign in to your profile.</p>
+
+<label for="kt-username">Username (new accounts)</label>
+<input id="kt-username" placeholder="e.g. NairobiCreator"
+maxlength="30" autocomplete="username">
+
+<label for="kt-email">Email address</label>
+<input id="kt-email" type="email" placeholder="you@example.com"
+autocomplete="email">
+
+<label for="kt-password">Password</label>
+<input id="kt-password" type="password" minlength="8"
+placeholder="At least 8 characters" autocomplete="current-password">
+
+<button id="kt-signup" class="account-button"
+style="background:#45e6a5;color:#111;font-weight:bold">
+Create account
+</button>
+
+<button id="kt-login" class="account-button"
+style="background:white;color:#111">
+Log in
+</button>
+
+<button id="kt-logout" class="account-button"
+style="display:none;background:#333;color:white">
+Log out
+</button>
+
+<p id="kt-status" role="status" aria-live="polite">
+Connecting to KenyaTik accounts...
+</p>
+
+<div id="kt-profile" hidden>
+<h3>Your profile</h3>
+<p id="kt-profile-name"></p>
+</div>
+</section>
+
 <script>
 "use strict";
 
+/* VIDEO FEED */
 const feed = document.getElementById("feed");
 const cards = Array.from(document.querySelectorAll(".video-card"));
-let followingMode = false;
 let previewUrl = null;
 
 function openPage(id, button) {
-  document.querySelectorAll(".page").forEach(function(page) {
-    page.classList.remove("active");
-  });
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
   document.getElementById(id).classList.add("active");
 
-  document.querySelectorAll("nav button").forEach(function(item) {
-    item.classList.remove("selected");
-  });
+  document.querySelectorAll("nav button").forEach(b => b.classList.remove("selected"));
   if (button) button.classList.add("selected");
 
   document.getElementById("feedTabs").style.display =
     id === "homePage" ? "flex" : "none";
 
-  cards.forEach(function(card) {
-    const video = card.querySelector("video");
-    if (video) video.pause();
-  });
-
+  cards.forEach(card => card.querySelector("video").pause());
   if (id === "discoverPage") searchVideos();
 }
 
 function showForYou() {
-  followingMode = false;
   document.getElementById("forYouTab").classList.add("active");
   document.getElementById("followingTab").classList.remove("active");
-  cards.forEach(function(card) { card.style.display = ""; });
+  cards.forEach(card => card.style.display = "");
 }
 
 function showFollowing() {
-  followingMode = true;
   document.getElementById("followingTab").classList.add("active");
   document.getElementById("forYouTab").classList.remove("active");
-  cards.forEach(function(card) { card.style.display = "none"; });
-  alert("Following feed will work when user accounts are added.");
+  cards.forEach(card => card.style.display = "none");
+  alert("The Following feed will be connected to user accounts in a later update.");
 }
 
 function toggleLike(button) {
   const count = button.querySelector("span");
-  let liked = button.dataset.liked === "yes";
-  liked = !liked;
+  const liked = button.dataset.liked !== "yes";
   button.dataset.liked = liked ? "yes" : "no";
   count.textContent = String(Math.max(0, Number(count.textContent) + (liked ? 1 : -1)));
   button.style.color = liked ? "#ff3155" : "white";
@@ -155,30 +204,29 @@ function toggleSound(button) {
   const video = button.closest(".video-card").querySelector("video");
   video.muted = !video.muted;
   button.textContent = video.muted ? "🔇 Sound" : "🔊 Sound";
-  if (!video.paused) return;
-  video.play().catch(function() {});
+  video.play().catch(() => {});
 }
 
 function sharePage() {
   if (navigator.share) {
-    navigator.share({title:"KenyaTik",url:location.href}).catch(function(){});
-  } else if (navigator.clipboard) {
-    navigator.clipboard.writeText(location.href)
-      .then(function(){alert("Website link copied.");})
-      .catch(function(){prompt("Copy this link:",location.href);});
+    navigator.share({title:"KenyaTik",url:location.href}).catch(() => {});
   } else {
-    prompt("Copy this link:",location.href);
+    prompt("Copy your KenyaTik website link:", location.href);
   }
 }
 
 function searchVideos() {
-  const query = document.getElementById("searchBox").value.trim().toLowerCase();
+  const search = document.getElementById("searchBox");
   const grid = document.getElementById("discoverGrid");
+  if (!search || !grid) return;
+
+  const query = search.value.trim().toLowerCase();
   grid.replaceChildren();
 
-  cards.forEach(function(card, index) {
+  cards.forEach((card, index) => {
     const caption = card.dataset.caption || "";
     const author = card.querySelector(".info b").textContent;
+
     if (query && !(caption + " " + author).toLowerCase().includes(query)) return;
 
     const tile = document.createElement("button");
@@ -186,13 +234,14 @@ function searchVideos() {
     tile.style.color = "white";
     tile.style.textAlign = "left";
     tile.textContent = "▶ " + author + " — " + caption;
-    tile.onclick = function() {
-      openPage("homePage",document.querySelector('nav button[data-page="homePage"]'));
+
+    tile.onclick = () => {
+      openPage("homePage", document.querySelector('[data-page="homePage"]'));
       showForYou();
-      feed.scrollTo({top:cards[index].offsetTop,behavior:"smooth"});
-      const video = cards[index].querySelector("video");
-      video.play().catch(function(){});
+      cards[index].scrollIntoView({behavior:"smooth"});
+      cards[index].querySelector("video").play().catch(() => {});
     };
+
     grid.appendChild(tile);
   });
 
@@ -205,10 +254,9 @@ function searchVideos() {
 }
 
 function previewVideo() {
-  const fileInput = document.getElementById("videoFile");
+  const file = document.getElementById("videoFile").files[0];
   const status = document.getElementById("uploadStatus");
   const preview = document.getElementById("preview");
-  const file = fileInput.files && fileInput.files[0];
 
   if (!file) {
     status.textContent = "Choose a video from your phone first.";
@@ -227,73 +275,31 @@ function previewVideo() {
   previewUrl = URL.createObjectURL(file);
   preview.src = previewUrl;
   preview.style.display = "block";
-  status.textContent = "Video selected: " + file.name +
-    ". This is only a local preview; it has not been uploaded.";
+  status.textContent = "Local preview only. This video has not been uploaded.";
 }
 
-const observer = new IntersectionObserver(function(entries) {
-  entries.forEach(function(entry) {
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
     const video = entry.target.querySelector("video");
     if (!document.getElementById("homePage").classList.contains("active")) {
       video.pause();
-      return;
-    }
-    if (entry.isIntersecting && entry.intersectionRatio >= 0.6) {
-      cards.forEach(function(card) {
+    } else if (entry.isIntersecting && entry.intersectionRatio >= 0.6) {
+      cards.forEach(card => {
         const other = card.querySelector("video");
         if (other !== video) other.pause();
       });
-      video.play().catch(function(){});
+      video.play().catch(() => {});
     } else {
       video.pause();
     }
   });
 }, {threshold:[0,0.6,1]});
 
-cards.forEach(function(card) { observer.observe(card); });
+cards.forEach(card => observer.observe(card));
 searchVideos();
-  // Supabase connection
-const SUPABASE_URL = "PASTE_YOUR_PROJECT_URL_HERE";
-const SUPABASE_KEY = "PASTE_YOUR_PUBLISHABLE_KEY_HERE";
 
-const supabaseClient = window.supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_KEY
-);
-</script>
-  
-<!-- KenyaTik account panel -->
-<section id="kt-account" style="background:#171717;color:white;padding:20px;margin:16px;border-radius:16px;font-family:Arial,sans-serif">
-  <h2 style="color:#45e6a5">🇰🇪 KenyaTik Account</h2>
-  <p>Create an account or sign in to your profile.</p>
-
-  <label for="kt-username">Username (for new accounts)</label>
-  <input id="kt-username" placeholder="e.g. NairobiCreator" maxlength="30"
-    autocomplete="username" style="display:block;width:100%;padding:12px;margin:8px 0 14px;box-sizing:border-box">
-
-  <label for="kt-email">Email address</label>
-  <input id="kt-email" type="email" placeholder="you@example.com"
-    autocomplete="email" style="display:block;width:100%;padding:12px;margin:8px 0 14px;box-sizing:border-box">
-
-  <label for="kt-password">Password (at least 8 characters)</label>
-  <input id="kt-password" type="password" minlength="8" placeholder="Enter a password"
-    autocomplete="current-password" style="display:block;width:100%;padding:12px;margin:8px 0 14px;box-sizing:border-box">
-
-  <button id="kt-signup" style="padding:12px;background:#45e6a5;border:0;border-radius:8px;font-weight:bold">Create account</button>
-  <button id="kt-login" style="padding:12px;background:white;border:0;border-radius:8px;margin:6px">Log in</button>
-  <button id="kt-logout" style="display:none;padding:12px;background:#333;color:white;border:0;border-radius:8px">Log out</button>
-
-  <p id="kt-status" role="status" aria-live="polite">Account connection not yet configured.</p>
-  <div id="kt-profile" hidden>
-    <h3>Your profile</h3>
-    <p id="kt-profile-name"></p>
-  </div>
-</section>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
+/* SUPABASE ACCOUNT SYSTEM */
 (() => {
-  // Replace both placeholders with your Supabase browser-safe details.
   const SUPABASE_URL = "https://tyljepyqlesaeugiutju.supabase.co";
   const SUPABASE_KEY = "sb_publishable_MvfzOlmfQ-jdHBArvG4wrA_VLjyan4E";
 
@@ -306,30 +312,27 @@ const supabaseClient = window.supabase.createClient(
   const emailInput = document.getElementById("kt-email");
   const passwordInput = document.getElementById("kt-password");
 
-  if (SUPABASE_URL.includes("PASTE_") ||
-      SUPABASE_KEY.includes("PASTE_")) {
-    status.textContent = "Add your Supabase Project URL and publishable key to connect accounts.";
-    return;
-  }
-
-  if (!window.supabase) {
-    status.textContent = "Could not load the account library. Check your internet connection.";
-    return;
-  }
-
-  const client = window.supabase.createClient(
-    SUPABASE_URL, SUPABASE_KEY
-  );
-
   function showStatus(message) {
     status.textContent = message;
+  }
+
+  if (!window.supabase || !window.supabase.createClient) {
+    showStatus("Account library failed to load. Check your internet connection and refresh.");
+    return;
+  }
+
+  let client;
+  try {
+    client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  } catch (error) {
+    showStatus("Could not start accounts: " + error.message);
+    return;
   }
 
   async function saveAndShowProfile(user) {
     if (!user) return;
 
-    // Use an existing username when the profile already exists.
-    const { data: existing, error: readError } = await client
+    const {data: existing, error: readError} = await client
       .from("profiles")
       .select("id,username")
       .eq("id", user.id)
@@ -343,26 +346,27 @@ const supabaseClient = window.supabase.createClient(
     let username = existing?.username;
 
     if (!existing) {
-      username = usernameInput.value.trim();
+      username =
+        usernameInput.value.trim() ||
+        user.user_metadata?.username ||
+        "";
 
       if (!/^[A-Za-z0-9_]{3,30}$/.test(username)) {
-        showStatus("Choose a username of 3–30 letters, numbers or underscores, then create your account again or sign in.");
+        showStatus("Please enter a username of 3–30 letters, numbers or underscores.");
         return;
       }
 
-      const { error: insertError } = await client
+      const {error: insertError} = await client
         .from("profiles")
-        .insert({ id: user.id, username });
+        .insert({id:user.id, username});
 
       if (insertError) {
-        showStatus("Account is signed in, but profile save failed: " + insertError.message);
+        showStatus("Signed in, but saving your profile failed: " + insertError.message);
         return;
       }
     }
 
-    document.getElementById("kt-profile-name").textContent =
-      "@" + username;
-
+    document.getElementById("kt-profile-name").textContent = "@" + username;
     profile.hidden = false;
     logout.style.display = "inline-block";
     signup.style.display = "none";
@@ -386,15 +390,15 @@ const supabaseClient = window.supabase.createClient(
     }
 
     signup.disabled = true;
-    showStatus("Creating account…");
+    showStatus("Creating account...");
 
     try {
-      const { data, error } = await client.auth.signUp({
+      const {data, error} = await client.auth.signUp({
         email,
         password,
         options: {
           emailRedirectTo: location.origin + location.pathname,
-          data: { username }
+          data: {username}
         }
       });
 
@@ -403,7 +407,7 @@ const supabaseClient = window.supabase.createClient(
       if (data.session && data.user) {
         await saveAndShowProfile(data.user);
       } else {
-        showStatus("Check your email to confirm your account, then log in using the same username.");
+        showStatus("Account request received. Check your email to confirm, then log in using your email and password.");
       }
     } catch (error) {
       showStatus("Registration failed: " + error.message);
@@ -422,10 +426,10 @@ const supabaseClient = window.supabase.createClient(
     }
 
     login.disabled = true;
-    showStatus("Signing in…");
+    showStatus("Signing in...");
 
     try {
-      const { data, error } = await client.auth.signInWithPassword({
+      const {data, error} = await client.auth.signInWithPassword({
         email, password
       });
 
@@ -439,34 +443,38 @@ const supabaseClient = window.supabase.createClient(
   });
 
   logout.addEventListener("click", async () => {
-    const { error } = await client.auth.signOut();
+    logout.disabled = true;
+    try {
+      const {error} = await client.auth.signOut();
+      if (error) throw error;
 
-    if (error) {
+      profile.hidden = true;
+      logout.style.display = "none";
+      signup.style.display = "inline-block";
+      login.style.display = "inline-block";
+      usernameInput.disabled = false;
+      showStatus("You have logged out.");
+    } catch (error) {
       showStatus("Could not log out: " + error.message);
-      return;
-    }
-
-    profile.hidden = true;
-    logout.style.display = "none";
-    signup.style.display = "inline-block";
-    login.style.display = "inline-block";
-    usernameInput.disabled = false;
-    showStatus("You have logged out.");
-  });
-
-  client.auth.getSession().then(({ data, error }) => {
-    if (error) {
-      showStatus("Could not check session: " + error.message);
-    } else if (data.session) {
-      saveAndShowProfile(data.session.user);
-    } else {
-      showStatus("Ready. Create an account or log in.");
+    } finally {
+      logout.disabled = false;
     }
   });
+
+  client.auth.getSession()
+    .then(({data, error}) => {
+      if (error) {
+        showStatus("Could not check session: " + error.message);
+      } else if (data.session) {
+        saveAndShowProfile(data.session.user);
+      } else {
+        showStatus("Ready. Create an account or log in.");
+      }
+    })
+    .catch(error => {
+      showStatus("Could not connect to accounts: " + error.message);
+    });
 })();
 </script>
-</body>
-</html>
-
 </body>
 </html>
