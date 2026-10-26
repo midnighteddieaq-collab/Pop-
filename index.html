@@ -261,5 +261,212 @@ const supabaseClient = window.supabase.createClient(
   SUPABASE_KEY
 );
 </script>
+  
+<!-- KenyaTik account panel -->
+<section id="kt-account" style="background:#171717;color:white;padding:20px;margin:16px;border-radius:16px;font-family:Arial,sans-serif">
+  <h2 style="color:#45e6a5">🇰🇪 KenyaTik Account</h2>
+  <p>Create an account or sign in to your profile.</p>
+
+  <label for="kt-username">Username (for new accounts)</label>
+  <input id="kt-username" placeholder="e.g. NairobiCreator" maxlength="30"
+    autocomplete="username" style="display:block;width:100%;padding:12px;margin:8px 0 14px;box-sizing:border-box">
+
+  <label for="kt-email">Email address</label>
+  <input id="kt-email" type="email" placeholder="you@example.com"
+    autocomplete="email" style="display:block;width:100%;padding:12px;margin:8px 0 14px;box-sizing:border-box">
+
+  <label for="kt-password">Password (at least 8 characters)</label>
+  <input id="kt-password" type="password" minlength="8" placeholder="Enter a password"
+    autocomplete="current-password" style="display:block;width:100%;padding:12px;margin:8px 0 14px;box-sizing:border-box">
+
+  <button id="kt-signup" style="padding:12px;background:#45e6a5;border:0;border-radius:8px;font-weight:bold">Create account</button>
+  <button id="kt-login" style="padding:12px;background:white;border:0;border-radius:8px;margin:6px">Log in</button>
+  <button id="kt-logout" style="display:none;padding:12px;background:#333;color:white;border:0;border-radius:8px">Log out</button>
+
+  <p id="kt-status" role="status" aria-live="polite">Account connection not yet configured.</p>
+  <div id="kt-profile" hidden>
+    <h3>Your profile</h3>
+    <p id="kt-profile-name"></p>
+  </div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(() => {
+  // Replace both placeholders with your Supabase browser-safe details.
+  const SUPABASE_URL = "PASTE_YOUR_PROJECT_URL_HERE";
+  const SUPABASE_KEY = "PASTE_YOUR_PUBLISHABLE_KEY_HERE";
+
+  const status = document.getElementById("kt-status");
+  const signup = document.getElementById("kt-signup");
+  const login = document.getElementById("kt-login");
+  const logout = document.getElementById("kt-logout");
+  const profile = document.getElementById("kt-profile");
+  const usernameInput = document.getElementById("kt-username");
+  const emailInput = document.getElementById("kt-email");
+  const passwordInput = document.getElementById("kt-password");
+
+  if (SUPABASE_URL.includes("PASTE_") ||
+      SUPABASE_KEY.includes("PASTE_")) {
+    status.textContent = "Add your Supabase Project URL and publishable key to connect accounts.";
+    return;
+  }
+
+  if (!window.supabase) {
+    status.textContent = "Could not load the account library. Check your internet connection.";
+    return;
+  }
+
+  const client = window.supabase.createClient(
+    SUPABASE_URL, SUPABASE_KEY
+  );
+
+  function showStatus(message) {
+    status.textContent = message;
+  }
+
+  async function saveAndShowProfile(user) {
+    if (!user) return;
+
+    // Use an existing username when the profile already exists.
+    const { data: existing, error: readError } = await client
+      .from("profiles")
+      .select("id,username")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    if (readError) {
+      showStatus("Signed in, but profile lookup failed: " + readError.message);
+      return;
+    }
+
+    let username = existing?.username;
+
+    if (!existing) {
+      username = usernameInput.value.trim();
+
+      if (!/^[A-Za-z0-9_]{3,30}$/.test(username)) {
+        showStatus("Choose a username of 3–30 letters, numbers or underscores, then create your account again or sign in.");
+        return;
+      }
+
+      const { error: insertError } = await client
+        .from("profiles")
+        .insert({ id: user.id, username });
+
+      if (insertError) {
+        showStatus("Account is signed in, but profile save failed: " + insertError.message);
+        return;
+      }
+    }
+
+    document.getElementById("kt-profile-name").textContent =
+      "@" + username;
+
+    profile.hidden = false;
+    logout.style.display = "inline-block";
+    signup.style.display = "none";
+    login.style.display = "none";
+    usernameInput.disabled = true;
+    showStatus("You're signed in to KenyaTik!");
+  }
+
+  signup.addEventListener("click", async () => {
+    const username = usernameInput.value.trim();
+    const email = emailInput.value.trim();
+    const password = passwordInput.value;
+
+    if (!/^[A-Za-z0-9_]{3,30}$/.test(username)) {
+      showStatus("Username must be 3–30 letters, numbers or underscores.");
+      return;
+    }
+    if (!email || password.length < 8) {
+      showStatus("Enter a valid email and a password of at least 8 characters.");
+      return;
+    }
+
+    signup.disabled = true;
+    showStatus("Creating account…");
+
+    try {
+      const { data, error } = await client.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: location.origin + location.pathname,
+          data: { username }
+        }
+      });
+
+      if (error) throw error;
+
+      if (data.session && data.user) {
+        await saveAndShowProfile(data.user);
+      } else {
+        showStatus("Check your email to confirm your account, then log in using the same username.");
+      }
+    } catch (error) {
+      showStatus("Registration failed: " + error.message);
+    } finally {
+      signup.disabled = false;
+    }
+  });
+
+  login.addEventListener("click", async () => {
+    const email = emailInput.value.trim();
+    const password = passwordInput.value;
+
+    if (!email || !password) {
+      showStatus("Enter your email and password.");
+      return;
+    }
+
+    login.disabled = true;
+    showStatus("Signing in…");
+
+    try {
+      const { data, error } = await client.auth.signInWithPassword({
+        email, password
+      });
+
+      if (error) throw error;
+      await saveAndShowProfile(data.user);
+    } catch (error) {
+      showStatus("Login failed: " + error.message);
+    } finally {
+      login.disabled = false;
+    }
+  });
+
+  logout.addEventListener("click", async () => {
+    const { error } = await client.auth.signOut();
+
+    if (error) {
+      showStatus("Could not log out: " + error.message);
+      return;
+    }
+
+    profile.hidden = true;
+    logout.style.display = "none";
+    signup.style.display = "inline-block";
+    login.style.display = "inline-block";
+    usernameInput.disabled = false;
+    showStatus("You have logged out.");
+  });
+
+  client.auth.getSession().then(({ data, error }) => {
+    if (error) {
+      showStatus("Could not check session: " + error.message);
+    } else if (data.session) {
+      saveAndShowProfile(data.session.user);
+    } else {
+      showStatus("Ready. Create an account or log in.");
+    }
+  });
+})();
+</script>
+</body>
+</html>
+
 </body>
 </html>
