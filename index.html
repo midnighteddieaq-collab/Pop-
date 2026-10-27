@@ -1,254 +1,56 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0a0f0b"><title>KenyaTik 🇰🇪</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-body{margin:0}
-img{max-width:100%}
-[hidden]{display:none!important}
-</style>
-<title>Kenya Tik</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Instrument+Sans:wght@400;500;600&display=swap">
-<style>
-/* Layout concept: a phone-width column app (feed, discover, inbox, profile) with animated Kenyan scenes standing in for video; flag red is the one signal colour. */
-:root{
-  --bg:#0a0f0b;--surface:#131b15;--raise:#1d281f;--fg:#f2efe8;--muted:#9aa89d;--line:rgba(255,255,255,.14);
-  --red:#e8372f;--on-red:#ffffff;--green:#25a85f;--sun:#f6b930;
-  --stage:#0b0b0b;--media-fg:#ffffff;--scrim:rgba(0,0,0,.55);--dim:rgba(0,0,0,.55);
-  --f-display:'Bricolage Grotesque','Trebuchet MS',system-ui,sans-serif;
-  --f-body:'Instrument Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
-  --gl:max(16px,env(safe-area-inset-left,0px));--gr:max(16px,env(safe-area-inset-right,0px));
-  color-scheme:dark;
-}
-@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){
-  --bg:#eff4ee;--surface:#ffffff;--raise:#e3ebe4;--fg:#0e1610;--muted:#556559;--line:rgba(14,22,16,.16);
-  --red:#cc2822;--green:#177a43;--dim:rgba(14,22,16,.45);color-scheme:light}}
-:root[data-theme="light"]{
-  --bg:#eff4ee;--surface:#ffffff;--raise:#e3ebe4;--fg:#0e1610;--muted:#556559;--line:rgba(14,22,16,.16);
-  --red:#cc2822;--green:#177a43;--dim:rgba(14,22,16,.45);color-scheme:light}
-*{box-sizing:border-box}
-html,body{height:100%}
-body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.4;overflow:hidden;-webkit-tap-highlight-color:transparent}
-button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-align:inherit}
-input,textarea,select{font:inherit;color:var(--fg);background:var(--raise);border:1px solid var(--line);border-radius:10px;padding:10px 12px;width:100%;min-width:0}
-textarea{resize:vertical;min-height:72px}
-:focus-visible{outline:2px solid var(--sun);outline-offset:2px}
-h1,h2,h3,p{margin:0}
-h1,h2,h3{font-family:var(--f-display);text-wrap:balance}
-.i{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
-.muted{color:var(--muted)}
-.sm{font-size:13px}
-#app{position:relative;height:100%;max-width:480px;margin:0 auto;display:flex;flex-direction:column;background:var(--bg);overflow:hidden;border-inline:1px solid var(--line)}
-main{position:relative;flex:1;min-height:0}
-.view{position:absolute;inset:0;overflow-y:auto;overscroll-behavior:contain}
-#v-home{overflow:hidden;background:var(--stage)}
-.pad{padding-inline:var(--gl) var(--gr)}
-
-/* nav */
-#nav{display:flex;align-items:center;justify-content:space-around;gap:4px;padding:6px var(--gr) 6px var(--gl);background:var(--bg);border-top:1px solid var(--line)}
-#nav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px;font-weight:500;color:var(--muted);padding:4px 0;min-width:0}
-#nav button[aria-current=page]{color:var(--fg)}
-#nav .mk{flex:none;width:52px;height:34px;border-radius:10px;background:var(--red);color:var(--on-red);display:grid;place-items:center;padding:0}
-
-/* home top bar */
-.topbar{position:absolute;z-index:5;top:0;left:0;right:0;display:flex;align-items:center;gap:8px;padding:10px var(--gr) 26px var(--gl);background:linear-gradient(var(--scrim),transparent);color:var(--media-fg)}
-.live-pill{display:flex;align-items:center;gap:6px;background:var(--red);color:var(--on-red);font-weight:600;font-size:12px;letter-spacing:.06em;padding:6px 10px;border-radius:999px;flex:none}
-.live-pill i{width:7px;height:7px;border-radius:50%;background:#fff;animation:pulse 1.4s infinite}
-.tabs{flex:1;min-width:0;display:flex;justify-content:safe center;gap:16px;overflow-x:auto;scrollbar-width:none}
-.tabs button{font-weight:600;font-size:15px;opacity:.65;white-space:nowrap;padding:6px 0;border-bottom:2px solid transparent;text-shadow:0 1px 3px rgba(0,0,0,.6)}
-.tabs button[aria-selected=true]{opacity:1;border-color:currentColor}
-.ib{width:36px;height:36px;display:grid;place-items:center;border-radius:50%;flex:none}
-
-/* feed */
-.feed{height:100%;overflow-y:auto;scroll-snap-type:y mandatory;scrollbar-width:none;overscroll-behavior:contain}
-.feed::-webkit-scrollbar{display:none}
-.post{position:relative;height:100%;scroll-snap-align:start;scroll-snap-stop:always;overflow:hidden;background:var(--stage);color:var(--media-fg)}
-.stage{position:absolute;inset:0;cursor:pointer}
-.scene,.vid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
-.scene svg{width:100%;height:100%;display:block}
-.split{position:absolute;inset:0;display:grid}
-.split .scene,.split .vid{position:relative}
-.shade{position:absolute;inset:0;background:linear-gradient(transparent 50%,rgba(0,0,0,.7));pointer-events:none}
-.tov{position:absolute;left:50%;top:38%;transform:translateX(-50%);max-width:80%;text-align:center;font-family:var(--f-display);font-weight:800;font-size:26px;line-height:1.1;color:#fff;text-shadow:0 2px 10px rgba(0,0,0,.6);pointer-events:none;overflow-wrap:anywhere}
-.cc{position:absolute;left:var(--gl);right:84px;bottom:150px;text-align:center;pointer-events:none}
-.cc span{background:rgba(0,0,0,.6);padding:3px 8px;border-radius:6px;font-size:14px;font-weight:600;box-decoration-break:clone;-webkit-box-decoration-break:clone}
-.meta{position:absolute;left:var(--gl);right:84px;bottom:16px;display:flex;flex-direction:column;gap:6px;text-shadow:0 1px 4px rgba(0,0,0,.7)}
-.who{display:flex;align-items:center;gap:6px;font-weight:600;font-size:16px}
-.vf{width:16px;height:16px;border-radius:50%;background:var(--green);display:grid;place-items:center;flex:none}
-.vf .i{width:11px;height:11px;stroke:#fff;stroke-width:3}
-.cap{font-size:14px;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
-.cap button{font-weight:600}
-.rf{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;background:rgba(0,0,0,.5);padding:3px 9px;border-radius:999px;align-self:flex-start}
-.snd{display:flex;align-items:center;gap:8px;font-size:13px}
-.snd .i{width:16px;height:16px}
-.mq{overflow:hidden;white-space:nowrap;flex:1;min-width:0}
-.mq span{display:inline-block;padding-left:100%;animation:mq 12s linear infinite}
-.rail{position:absolute;right:var(--gr);bottom:20px;display:flex;flex-direction:column;align-items:center;gap:16px;color:var(--media-fg)}
-.rb{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:12px;font-weight:600;text-shadow:0 1px 3px rgba(0,0,0,.7);min-width:44px}
-.rb .i{width:32px;height:32px;filter:drop-shadow(0 1px 3px rgba(0,0,0,.6))}
-.rb.on[data-act=like] .i{fill:var(--red);stroke:var(--red)}
-.rb.on[data-act=save] .i{fill:var(--sun);stroke:var(--sun)}
-.avw{position:relative;margin-bottom:10px}
-.avt{width:100%;height:100%;border-radius:50%;display:grid;place-items:center;color:#fff;font-family:var(--f-display);font-weight:800}
-.av{width:46px;height:46px;border-radius:50%;border:2px solid #fff;display:block;overflow:hidden}
-.plus{position:absolute;left:50%;bottom:-10px;transform:translateX(-50%);width:22px;height:22px;border-radius:50%;background:var(--red);color:var(--on-red);display:grid;place-items:center}
-.plus .i{width:14px;height:14px;stroke-width:3}
-.disc{width:40px;height:40px;border-radius:50%;background:conic-gradient(var(--red),var(--sun),var(--green),var(--red));display:grid;place-items:center;animation:spin 5s linear infinite;border:6px solid #111}
-.disc i{width:8px;height:8px;border-radius:50%;background:#111;display:block}
-.paused .disc{animation-play-state:paused}
-.prog{position:absolute;left:0;right:0;bottom:0;height:3px;background:rgba(255,255,255,.22)}
-.prog i{display:block;height:100%;width:0;background:#fff}
-.active:not(.paused) .prog i.auto{animation:prog 14s linear infinite}
-.pbig{position:absolute;left:50%;top:50%;width:72px;height:72px;margin:-36px 0 0 -36px;display:grid;place-items:center;border-radius:50%;background:rgba(0,0,0,.45);opacity:0;pointer-events:none;transition:opacity .15s}
-.pbig .i{width:36px;height:36px;fill:#fff;stroke:#fff}
-.paused .pbig{opacity:1}
-.heart{position:absolute;pointer-events:none;width:84px;height:84px;margin:-42px 0 0 -42px;color:var(--red);animation:burst .8s ease-out forwards}
-.heart .i{width:84px;height:84px;fill:var(--red);stroke:var(--red)}
-.empty{height:100%;display:grid;place-content:center;justify-items:center;gap:14px;text-align:center;padding:24px var(--gr) 24px var(--gl);color:var(--media-fg)}
-
-/* generic */
-.btn{padding:11px 18px;border-radius:12px;background:var(--red);color:var(--on-red);font-weight:600;text-align:center}
-.btn.ghost{background:var(--raise);color:var(--fg)}
-.btn.sm{padding:6px 14px;font-size:13px;border-radius:10px}
-.btn[disabled]{opacity:.5}
-.chips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
-.chip{padding:7px 12px;border-radius:999px;border:1px solid var(--line);background:var(--raise);font-size:13px;white-space:nowrap;flex:none}
-.chip[aria-pressed=true],.chip[aria-selected=true]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
-.vh{font-family:var(--f-display);font-weight:800;font-size:26px;letter-spacing:-.01em}
-.vhead{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px var(--gr) 8px var(--gl)}
-.sec{padding:14px var(--gr) 4px var(--gl);display:flex;align-items:baseline;justify-content:space-between;gap:12px}
-.sec h3{font-size:17px}
-.search{padding:4px var(--gr) 8px var(--gl);position:relative}
-.search input{padding-left:40px;border-radius:999px}
-.search .i{position:absolute;left:calc(var(--gl) + 12px);top:50%;margin-top:-14px;width:20px;height:20px;color:var(--muted)}
-.hpad{padding:6px var(--gr) 6px var(--gl)}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:3px;padding-inline:var(--gl) var(--gr)}
-.tile{position:relative;aspect-ratio:3/4;overflow:hidden;background:var(--stage);display:block;width:100%}
-.tile svg *{animation:none!important}
-.tile b{position:absolute;left:6px;bottom:5px;font-size:12px;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.8);display:flex;align-items:center;gap:3px}
-.tile b .i{width:13px;height:13px}
-.tile em{position:absolute;right:6px;top:6px;font-style:normal;font-size:11px;font-weight:600;background:var(--red);color:var(--on-red);padding:2px 6px;border-radius:6px}
-.list{display:flex;flex-direction:column}
-.li{display:flex;align-items:center;gap:12px;padding:10px var(--gr) 10px var(--gl);width:100%}
-.li .avt{width:100%;height:100%}
-.li .ava{width:44px;height:44px;flex:none;border-radius:50%;overflow:hidden}
-.li .tx{flex:1;min-width:0}
-.li .tx b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.li .tx span{display:block;color:var(--muted);font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.dot{width:9px;height:9px;border-radius:50%;background:var(--red);flex:none}
-.hscroll{display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;padding:4px var(--gr) 6px var(--gl)}
-.lcard{position:relative;flex:none;width:132px;aspect-ratio:3/4;border-radius:12px;overflow:hidden;background:var(--stage);color:#fff}
-.lcard svg *{animation:none!important}
-.lcard .shade{background:linear-gradient(transparent 40%,rgba(0,0,0,.75))}
-.lcard .lt{position:absolute;left:8px;right:8px;bottom:8px;font-size:12px;line-height:1.25;display:flex;flex-direction:column;gap:2px}
-.lcard .lt b{font-size:13px}
-.badge{position:absolute;left:8px;top:8px;background:var(--red);color:var(--on-red);font-size:10px;font-weight:600;letter-spacing:.06em;padding:2px 6px;border-radius:6px}
-.acc{flex:none;width:112px;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;padding:12px 8px;border-radius:14px;background:var(--surface);border:1px solid var(--line)}
-.acc .ava{width:52px;height:52px;border-radius:50%;overflow:hidden}
-.acc b{font-size:13px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.shopcard{margin:6px var(--gr) 0 var(--gl);display:flex;align-items:center;gap:14px;padding:14px;border-radius:16px;background:var(--surface);border:1px solid var(--line);width:calc(100% - var(--gl) - var(--gr))}
-.shopcard .ic{width:44px;height:44px;border-radius:12px;background:var(--green);color:#fff;display:grid;place-items:center;flex:none}
-
-/* profile */
-.ph{display:flex;flex-direction:column;align-items:center;gap:8px;padding:6px var(--gr) 10px var(--gl);text-align:center}
-.ph .ava{width:92px;height:92px;border-radius:50%;overflow:hidden;font-size:34px}
-.ph h2{font-size:22px}
-.stats{display:flex;gap:26px;justify-content:center}
-.stats div{display:flex;flex-direction:column;align-items:center}
-.stats b{font-family:var(--f-display);font-size:19px}
-.stats span{font-size:12px;color:var(--muted)}
-.pbtns{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
-.ptabs{display:flex;border-bottom:1px solid var(--line);margin-top:8px;overflow-x:auto;scrollbar-width:none;padding-inline:var(--gl) var(--gr)}
-.ptabs button{flex:1;padding:11px 8px;font-weight:600;font-size:14px;color:var(--muted);border-bottom:2px solid transparent;white-space:nowrap;text-align:center}
-.ptabs button[aria-selected=true]{color:var(--fg);border-color:var(--fg)}
-.dr{display:flex;align-items:center;gap:12px;padding:10px var(--gr) 10px var(--gl)}
-.dr .tile{width:60px;flex:none}
-.dr .tx{flex:1;min-width:0}
-.dr .tx b,.dr .tx span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-
-/* layers */
-#layer{position:absolute;inset:0;pointer-events:none;z-index:50}
-.sheet-wrap{position:absolute;inset:0;display:flex;align-items:flex-end;pointer-events:auto;opacity:0;transition:opacity .2s}
-.sheet-wrap.in{opacity:1}
-.sheet-bg{position:absolute;inset:0;background:var(--dim)}
-.sheet{position:relative;width:100%;max-height:86%;display:flex;flex-direction:column;background:var(--surface);color:var(--fg);border-radius:18px 18px 0 0;transform:translateY(24px);transition:transform .22s;box-shadow:0 -8px 30px rgba(0,0,0,.35)}
-.sheet.tall{height:72%}
-.in .sheet{transform:none}
-.sh-h{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px var(--gr) 8px var(--gl)}
-.sh-h h2{font-size:18px}
-.x{width:36px;height:36px;display:grid;place-items:center;border-radius:50%;background:var(--raise);flex:none}
-.sh-b{overflow-y:auto;padding:4px var(--gr) 18px var(--gl);display:flex;flex-direction:column;gap:12px;min-height:0;flex:1}
-.full{position:absolute;inset:0;background:var(--bg);color:var(--fg);pointer-events:auto;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .22s}
-.full.in{transform:none}
-.fh{display:flex;align-items:center;gap:8px;padding:8px var(--gr) 8px calc(var(--gl) - 8px);border-bottom:1px solid var(--line)}
-.fh h2{flex:1;min-width:0;font-size:18px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.fb{flex:1;min-height:0;overflow-y:auto;padding:12px var(--gr) 20px var(--gl);display:flex;flex-direction:column;gap:14px}
-.fb.flush{padding:0}
-.viewer{background:var(--stage)}
-.vback{position:absolute;z-index:6;left:calc(var(--gl) - 6px);top:10px;width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,.5);color:#fff;display:grid;place-items:center}
-.row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}
-.row label,.row .lb{flex:1;min-width:0}
-.row small{display:block;color:var(--muted);font-size:12px}
-.row select,.row input[type=text]{width:140px}
-.sw{appearance:none;-webkit-appearance:none;width:44px;height:26px;border-radius:999px;background:var(--raise);border:1px solid var(--line);position:relative;padding:0;flex:none;cursor:pointer}
-.sw::after{content:"";position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:var(--muted);transition:transform .15s}
-.sw:checked{background:var(--green);border-color:var(--green)}
-.sw:checked::after{transform:translateX(18px);background:#fff}
-.fl-label{font-size:12px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;display:block}
-.cr-prev{position:relative;aspect-ratio:9/14;max-height:300px;margin:0 auto;width:min(100%,196px);border-radius:14px;overflow:hidden;background:var(--stage);color:#fff;display:grid;place-items:center}
-.cr-prev .tov{font-size:18px}
-.cr-prev .ph-t{position:relative;padding:12px;text-align:center;font-size:13px;color:#cfd8d1;z-index:1}
-.cr-prev .rf{position:absolute;left:6px;bottom:6px;font-size:11px;z-index:2}
-.pick{display:flex;gap:8px;flex-wrap:wrap}
-.pick input[type=file]{display:none}
-.sceneopt{width:46px;height:62px;border-radius:8px;overflow:hidden;border:2px solid transparent;flex:none;position:relative;padding:0}
-.sceneopt[aria-pressed=true]{border-color:var(--sun)}
-.sceneopt .scene{position:absolute;inset:0}
-.sceneopt svg *{animation:none!important}
-.cm-list{display:flex;flex-direction:column;gap:14px}
-.cm{display:flex;gap:10px;align-items:flex-start}
-.cm .ava{width:34px;height:34px;border-radius:50%;overflow:hidden;flex:none;font-size:14px}
-.cm .tx{flex:1;min-width:0}
-.cm .tx b{font-size:13px;color:var(--muted)}
-.cm .tx p{font-size:14px;overflow-wrap:anywhere}
-.cm .tx .mt{font-size:12px;color:var(--muted);display:flex;gap:12px}
-.cm .lk{display:flex;flex-direction:column;align-items:center;font-size:12px;color:var(--muted);flex:none}
-.cm .lk .i{width:18px;height:18px}
-.cm .lk.on{color:var(--red)}
-.cm .lk.on .i{fill:var(--red)}
-.men{color:var(--sun);font-weight:600}
-.cm-form{display:flex;gap:8px;position:sticky;bottom:0;background:var(--surface);padding-top:8px}
-.quick{display:flex;gap:8px;flex-wrap:wrap}
-.quick button{font-size:20px;padding:2px 6px}
-.sg{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-.sg button{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:12px;text-align:center;padding:10px 4px;border-radius:12px;background:var(--raise);min-width:0}
-.sg button[disabled]{opacity:.4}
-.sg button span{max-width:100%;overflow-wrap:anywhere}
-.msgs{display:flex;flex-direction:column;gap:8px}
-.msg{max-width:78%;padding:9px 12px;border-radius:16px;background:var(--raise);overflow-wrap:anywhere}
-.msg.me{align-self:flex-end;background:var(--red);color:var(--on-red)}
-.chatf{display:flex;gap:8px;padding:10px var(--gr) 10px var(--gl);border-top:1px solid var(--line)}
-.bars{display:flex;flex-direction:column;gap:10px}
-.bar{display:grid;gap:4px}
-.bar .tr{height:10px;border-radius:99px;background:var(--raise);overflow:hidden}
-.bar .tr i{display:block;height:100%;background:var(--green);border-radius:99px}
-.sum{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-.sum div{background:var(--raise);border-radius:12px;padding:10px 12px}
-.sum b{font-family:var(--f-display);font-size:22px;display:block}
-.prod{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
-.prod .sw2{width:56px;height:56px;border-radius:12px;flex:none}
-.prod .tx{flex:1;min-width:0}
-.prod .tx b,.prod .tx span{display:block}
-
-/* live room */
-.room{background:var(--stage);color:#fff}
-.room .scene{position:absolute;inset:0}
-.room .top{position:absolute;z-index:3;top:10px;left:var(--gl);right:var(--gr);display:flex;align-items:center;gap:8px}
-.room .host{display:flex;align-items:center;gap:8px;background:rgba(0,0,0,.5);padding:4px 10px 4px 4px;border-radius:999px;min-width:0}
-.room .host .ava{width:32px;height:32px;border-radius:50%;overflow:hidden;flex:none;font-size:14px}
-.room .host b{font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}
-.room .host small{font-size:11px;opacity:.85;display:block}
-.room .xs{margin-left:auto}
-.room .x{background:rgba(0,0,0,.
+:root{--bg:#0a0f0b;--surface:#131b15;--raise:#1d281f;--fg:#f2efe8;--muted:#9aa89d;--line:#ffffff24;--red:#e8372f;--green:#25a85f;--display:'Bricolage Grotesque',sans-serif;--body:'Instrument Sans',sans-serif}
+*{box-sizing:border-box}html,body{height:100%;margin:0}body{background:var(--bg);color:var(--fg);font:15px var(--body);overflow:hidden}button,input,textarea{font:inherit}button{color:inherit;border:0;cursor:pointer}input,textarea{width:100%;padding:11px;border-radius:10px;border:1px solid var(--line);background:var(--raise);color:var(--fg)}textarea{min-height:75px}#app{height:100%;max-width:480px;margin:auto;display:flex;flex-direction:column;border-inline:1px solid var(--line)}header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--line)}h1,h2,p{margin:0}h1,h2{font-family:var(--display)}h1{font-size:23px}main{flex:1;min-height:0;position:relative}.view{position:absolute;inset:0;overflow:auto;display:none}.view.active{display:block}#home{overflow:hidden;background:#080908}.tabs{position:absolute;z-index:2;top:8px;left:0;right:0;display:flex;justify-content:center;gap:20px}.tabs button{background:transparent;padding:8px;color:#ccc}.tabs button.selected{color:#fff;border-bottom:2px solid #fff}.feed{height:100%;overflow:auto;scroll-snap-type:y mandatory}.post{height:100%;min-height:440px;position:relative;scroll-snap-align:start;overflow:hidden;background:linear-gradient(145deg,#183626,#507a49 50%,#b87d50);color:white}.post video{position:absolute;width:100%;height:100%;inset:0;object-fit:cover}.demo{position:absolute;inset:0;display:grid;place-content:center;text-align:center;font:800 34px var(--display)}.shade{position:absolute;inset:0;background:linear-gradient(transparent 40%,#000b)}.meta{position:absolute;bottom:20px;left:16px;right:82px;text-shadow:0 2px 4px #000}.meta b{display:block;margin-bottom:8px}.rail{position:absolute;right:12px;bottom:22px;display:flex;flex-direction:column;gap:18px}.rail button{background:transparent;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:12px;text-shadow:0 2px 4px #000}.rail strong{font-size:28px}.liked strong{color:#ff5369}.empty{position:absolute;inset:0;display:grid;place-content:center;text-align:center;padding:24px;gap:12px;color:white}.empty button{background:var(--red);padding:10px;border-radius:9px}nav{display:flex;justify-content:space-around;padding:8px 4px calc(8px + env(safe-area-inset-bottom));border-top:1px solid var(--line)}nav button{background:transparent;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;flex:1}nav button.current{color:white}.plus{background:var(--red);padding:4px 17px;border-radius:8px;font-size:19px}.pad{padding:16px}.title{font-size:27px;margin-bottom:14px}.muted,.status{color:var(--muted);font-size:13px}.btn{background:var(--red);color:white;padding:11px 14px;border-radius:10px;font-weight:600}.secondary{background:var(--raise);border:1px solid var(--line)}.card{background:var(--surface);border:1px solid var(--line);padding:14px;border-radius:14px;margin-bottom:12px}.stack{display:flex;flex-direction:column;gap:12px}.row{display:flex;gap:8px}.row>*{flex:1;min-width:0}.hidden{display:none!important}label{display:block;font-size:13px;color:var(--muted);margin-bottom:5px}#preview{display:none;width:100%;max-height:280px;background:#000;border-radius:10px}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:3px}.tile{position:relative;aspect-ratio:3/4;background:linear-gradient(145deg,#183626,#b87d50);overflow:hidden}.tile video{width:100%;height:100%;object-fit:cover}.tile span{position:absolute;bottom:4px;left:5px;right:5px;font-size:11px;text-shadow:0 1px 4px #000;overflow:hidden}.profilehead{text-align:center;padding:20px}.avatar{width:76px;height:76px;margin:0 auto 10px;border-radius:50%;display:grid;place-content:center;background:var(--green);font-size:30px}
+</style></head>
+<body><div id="app">
+<header><div><h1>KenyaTik 🇰🇪</h1><small class="muted">Share your Kenya</small></div><button class="btn secondary" id="accountShortcut">Account</button></header>
+<main>
+<section id="home" class="view active"><div class="tabs"><button class="selected" data-feed="for-you">For You</button><button data-feed="following">Following</button></div><div id="feed" class="feed"></div></section>
+<section id="discover" class="view"><div class="pad"><h2 class="title">Discover</h2><input id="search" placeholder="Search captions or creators"><p class="muted" style="margin:12px 0">Videos</p><div id="discoverGrid" class="grid"></div><p id="searchStatus" class="status"></p></div></section>
+<section id="create" class="view"><div class="pad"><h2 class="title">Create a video</h2><div class="card stack"><p class="muted">Sign in first. Maximum video size: 50 MB.</p><div><label for="videoFile">Choose video</label><input id="videoFile" type="file" accept="video/mp4,video/webm,video/quicktime"></div><video id="preview" controls playsinline></video><div><label for="captionInput">Caption</label><textarea id="captionInput" maxlength="500" placeholder="Write a caption…"></textarea></div><button id="uploadBtn" class="btn">Upload video</button><p id="uploadStatus" class="status"></p></div></div></section>
+<section id="inbox" class="view"><div class="pad"><h2 class="title">Inbox</h2><div class="card">Notifications and messaging can be added later.</div></div></section>
+<section id="profile" class="view"><div class="pad"><h2 class="title">Profile</h2><div class="card profilehead"><div class="avatar">🇰🇪</div><h2 id="profileName">@guest</h2><p id="profileEmail" class="muted" style="margin:8px 0 14px">Sign in to upload videos</p><div class="row"><button id="profileLogin" class="btn">Log in / Sign up</button><button id="logoutBtn" class="btn secondary hidden">Log out</button></div></div><h2 style="font-size:19px;margin:12px 0">Your videos</h2><div id="myVideos" class="grid"></div><p id="profileStatus" class="status"></p></div></section>
+<section id="account" class="view"><div class="pad"><h2 class="title">Account</h2><div class="card stack"><p class="muted">Create an account or log in.</p><div><label for="username">Username for new account</label><input id="username" autocomplete="username" maxlength="30" placeholder="e.g. sperchi"></div><div><label for="email">Email</label><input id="email" type="email" autocomplete="email" placeholder="you@example.com"></div><div><label for="password">Password (8+ characters)</label><input id="password" type="password" autocomplete="current-password" minlength="8"></div><div class="row"><button id="signupBtn" class="btn">Create account</button><button id="loginBtn" class="btn secondary">Log in</button></div><button id="accountLogout" class="btn secondary hidden">Log out</button><p id="accountStatus" class="status"></p><p class="muted">If email confirmation is enabled in Supabase, confirm your email before logging in.</p></div></div></section>
+</main>
+<nav><button class="current" data-page="home">⌂<span>Home</span></button><button data-page="discover">⌕<span>Discover</span></button><button data-page="create"><span class="plus">＋</span><span>Create</span></button><button data-page="inbox">♡<span>Inbox</span></button><button data-page="profile">◉<span>Profile</span></button></nav>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL="https://tyljepyqlesaeugiutju.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY="sb_publishable_MvfzOlmfQ-jdHBArvG4wrA_VLjyan4E";
+const VIDEO_BUCKET="kenyatiktok-videos";
+const client=window.supabase?.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY)||null;
+window.kenyaTikClient=client;
+const $=id=>document.getElementById(id);
+let currentUser=null,profile=null,videos=[],previewUrl=null,feedMode="for-you";
+const demos=[{id:"demo1",username:"KenyaTik",caption:"Welcome to KenyaTik 🇰🇪 Share your moments from Kenya."},{id:"demo2",username:"Explore Kenya",caption:"Upload your first video and join the community."}];
+function status(id,msg,error=false){$(id).textContent=msg;$(id).style.color=error?"#ff8b8b":"var(--muted)"}
+function go(id){document.querySelectorAll(".view").forEach(v=>v.classList.toggle("active",v.id===id));document.querySelectorAll("nav [data-page]").forEach(b=>b.classList.toggle("current",b.dataset.page===id));if(id==="profile")renderProfile();if(id==="discover")renderDiscover()}
+document.querySelectorAll("nav [data-page]").forEach(b=>b.onclick=()=>go(b.dataset.page));
+$("accountShortcut").onclick=()=>go("account");$("profileLogin").onclick=()=>go("account");
+document.querySelectorAll("[data-feed]").forEach(b=>b.onclick=()=>{feedMode=b.dataset.feed;document.querySelectorAll("[data-feed]").forEach(x=>x.classList.toggle("selected",x===b));renderFeed()});
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function createPost(v){const p=document.createElement("article");p.className="post";p.dataset.id=v.id;if(v.video_url){const vid=document.createElement("video");vid.src=v.video_url;vid.autoplay=true;vid.loop=true;vid.muted=true;vid.playsInline=true;vid.preload="metadata";vid.onclick=()=>vid.muted=!vid.muted;p.appendChild(vid)}else{const d=document.createElement("div");d.className="demo";d.innerHTML="KENYATIK<br><span style='font-size:20px'>🇰🇪</span>";p.appendChild(d)}const sh=document.createElement("div");sh.className="shade";p.appendChild(sh);const m=document.createElement("div");m.className="meta";m.innerHTML="<b>@"+esc(v.username||"KenyaTikCreator")+"</b><p>"+esc(v.caption||"")+"</p>"+(v.video_url?"<small>Tap video to toggle sound</small>":"<small>Demo card · use Create to upload a real video</small>");p.appendChild(m);const r=document.createElement("div");r.className="rail";r.innerHTML='<button data-a="like"><strong>♡</strong><span>0</span></button><button data-a="comment"><strong>☏</strong><span>Comment</span></button><button data-a="share"><strong>↗</strong><span>Share</span></button>';p.appendChild(r);r.querySelector('[data-a="like"]').onclick=e=>{let b=e.currentTarget;b.classList.toggle("liked");b.querySelector("span").textContent=b.classList.contains("liked")?"1":"0"};r.querySelector('[data-a="comment"]').onclick=()=>alert("Comments are not connected yet.");r.querySelector('[data-a="share"]').onclick=async()=>{try{if(navigator.share)await navigator.share({title:"KenyaTik",text:v.caption||"KenyaTik video",url:location.href});else{await navigator.clipboard.writeText(location.href);alert("Page link copied.")}}catch(e){}};return p}
+function renderFeed(){const f=$("feed");f.replaceChildren();if(feedMode==="following"){f.innerHTML='<div class="empty"><b>Following</b><p>Creator following is not connected yet.</p><button id="allVideos">See all videos</button></div>';$("allVideos").onclick=()=>{feedMode="for-you";document.querySelectorAll("[data-feed]").forEach(b=>b.classList.toggle("selected",b.dataset.feed==="for-you"));renderFeed()};return}(videos.length?videos:demos).forEach(v=>f.appendChild(createPost(v)))}
+async function loadVideos(){if(!client){renderFeed();return}try{const {data,error}=await client.from("videos").select("id,user_id,video_url,caption,created_at").order("created_at",{ascending:false}).limit(100);if(error)throw error;let rows=data||[],names={};const ids=[...new Set(rows.map(v=>v.user_id).filter(Boolean))];if(ids.length){const {data:ps}=await client.from("profiles").select("id,username").in("id",ids);(ps||[]).forEach(p=>names[p.id]=p.username)}videos=rows.map(v=>({...v,username:names[v.user_id]||"KenyaTikCreator"}));renderFeed();renderDiscover();renderProfile()}catch(e){console.error(e);videos=[];renderFeed();status("searchStatus","Could not load videos: "+e.message,true)}}
+async function loadProfile(){profile=null;if(!client||!currentUser)return;try{const {data,error}=await client.from("profiles").select("id,username").eq("id",currentUser.id).maybeSingle();if(error)throw error;profile=data}catch(e){console.warn("Profile lookup:",e.message)}}
+function updateAuth(){const yes=!!currentUser;$("logoutBtn").classList.toggle("hidden",!yes);$("accountLogout").classList.toggle("hidden",!yes);$("profileLogin").classList.toggle("hidden",yes);$("profileName").textContent=profile?.username?"@"+profile.username:yes?"@creator":"@guest";$("profileEmail").textContent=yes?(currentUser.email||"Signed in"):"Sign in to upload videos"}
+async function signup(){if(!client)return status("accountStatus","Supabase failed to load. Refresh the page.",true);const username=$("username").value.trim(),email=$("email").value.trim(),password=$("password").value;if(!/^[A-Za-z0-9_]{3,30}$/.test(username))return status("accountStatus","Username must be 3–30 letters, numbers, or underscores.",true);if(!email||password.length<8)return status("accountStatus","Enter a valid email and a password of at least 8 characters.",true);status("accountStatus","Creating account…");$("signupBtn").disabled=true;try{const {data,error}=await client.auth.signUp({email,password,options:{data:{username}}});if(error)throw error;if(data.session&&data.user){currentUser=data.user;const {error:pe}=await client.from("profiles").upsert({id:currentUser.id,username},{onConflict:"id"});if(pe)console.warn(pe.message);await loadProfile();updateAuth();status("accountStatus","Account created and signed in.")}else status("accountStatus","Account created. Check your email to confirm, then log in.")}catch(e){status("accountStatus",e.message||"Signup failed.",true)}finally{$("signupBtn").disabled=false}}
+async function login(){if(!client)return status("accountStatus","Supabase failed to load. Refresh the page.",true);const email=$("email").value.trim(),password=$("password").value;if(!email||!password)return status("accountStatus","Enter your email and password.",true);status("accountStatus","Logging in…");$("loginBtn").disabled=true;try{const {data,error}=await client.auth.signInWithPassword({email,password});if(error)throw error;currentUser=data.user;await loadProfile();updateAuth();status("accountStatus","Login successful.");go("profile")}catch(e){status("accountStatus",e.message||"Login failed.",true)}finally{$("loginBtn").disabled=false}}
+async function logout(){if(client){const {error}=await client.auth.signOut();if(error)status("accountStatus",error.message,true)}currentUser=null;profile=null;updateAuth();status("accountStatus","Logged out.");go("home")}
+$("signupBtn").onclick=signup;$("loginBtn").onclick=login;$("logoutBtn").onclick=logout;$("accountLogout").onclick=logout;
+$("videoFile").onchange=()=>{const file=$("videoFile").files[0];if(previewUrl)URL.revokeObjectURL(previewUrl);previewUrl=null;$("preview").removeAttribute("src");$("preview").style.display="none";if(!file)return;if(file.size>50*1024*1024){status("uploadStatus","File exceeds 50 MB. Choose a smaller video.",true);$("videoFile").value="";return}previewUrl=URL.createObjectURL(file);$("preview").src=previewUrl;$("preview").style.display="block";status("uploadStatus",file.name+" selected.")};
+async function upload(){if(!client)return status("uploadStatus","Supabase failed to load. Refresh.",true);if(!currentUser)return status("uploadStatus","Please log in before uploading.",true);const file=$("videoFile").files[0];if(!file)return status("uploadStatus","Choose a video first.",true);if(file.size>50*1024*1024)return status("uploadStatus","Video exceeds 50 MB.",true);if(!file.type.startsWith("video/"))return status("uploadStatus","Choose a video file.",true);const caption=$("captionInput").value.trim(),ext=(file.name.split(".").pop()||"mp4").toLowerCase().replace(/[^a-z0-9]/g,"")||"mp4",path=currentUser.id+"/"+Date.now()+"."+ext;$("uploadBtn").disabled=true;status("uploadStatus","Uploading… keep this page open.");try{const {data:up,error:ue}=await client.storage.from(VIDEO_BUCKET).upload(path,file,{cacheControl:"3600",upsert:false,contentType:file.type});if(ue)throw ue;const {data:pub}=client.storage.from(VIDEO_BUCKET).getPublicUrl(up.path);status("uploadStatus","Saving video details…");const {error:de}=await client.from("videos").insert({user_id:currentUser.id,video_url:pub.publicUrl,caption});if(de)throw new Error("Video file uploaded, but the database save failed: "+de.message);status("uploadStatus","Upload successful!");$("videoFile").value="";$("captionInput").value="";$("preview").pause();$("preview").removeAttribute("src");$("preview").style.display="none";if(previewUrl)URL.revokeObjectURL(previewUrl);previewUrl=null;await loadVideos();go("home")}catch(e){console.error(e);status("uploadStatus",e.message||"Upload failed. Check Storage and videos-table policies.",true)}finally{$("uploadBtn").disabled=false}}
+$("uploadBtn").onclick=upload;
+function renderDiscover(){const q=$("search").value.trim().toLowerCase(),grid=$("discoverGrid");grid.replaceChildren();const list=(videos.length?videos:demos).filter(v=>(v.caption||"").toLowerCase().includes(q)||(v.username||"").toLowerCase().includes(q));list.forEach(v=>{const t=document.createElement("div");t.className="tile";if(v.video_url){const vid=document.createElement("video");vid.src=v.video_url;vid.muted=true;vid.playsInline=true;vid.preload="metadata";t.appendChild(vid)}const s=document.createElement("span");s.textContent="@"+(v.username||"KenyaTik")+" · "+(v.caption||"");t.appendChild(s);t.onclick=()=>go("home");grid.appendChild(t)});status("searchStatus",list.length?list.length+" video(s) shown.":"No matching videos.")}
+$("search").oninput=renderDiscover;
+function renderProfile(){const mine=currentUser?videos.filter(v=>v.user_id===currentUser.id):[],grid=$("myVideos");grid.replaceChildren();mine.forEach(v=>{const t=document.createElement("div");t.className="tile";if(v.video_url){const vid=document.createElement("video");vid.src=v.video_url;vid.muted=true;vid.playsInline=true;t.appendChild(vid)}const s=document.createElement("span");s.textContent=v.caption||"Your video";t.appendChild(s);grid.appendChild(t)});status("profileStatus",currentUser?(mine.length?mine.length+" video(s) uploaded.":"You haven't uploaded a video yet."):"Log in to see your uploads.")}
+if(client)client.auth.onAuthStateChange((_event,session)=>{currentUser=session?.user||null;setTimeout(async()=>{await loadProfile();updateAuth()},0)});
+(async()=>{if(!client){status("accountStatus","Supabase library did not load. Check internet and refresh.",true);renderFeed();return}try{const {data}=await client.auth.getSession();currentUser=data.session?.user||null;await loadProfile();updateAuth()}catch(e){console.error(e)}await loadVideos();renderDiscover();renderProfile()})();
+</script></body></html>
