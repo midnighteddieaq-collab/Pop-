@@ -1,437 +1,574 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#080808">
-<title>KenyaTik 🇰🇪</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<style>
-*{box-sizing:border-box}
-:root{color-scheme:dark}
-body{margin:0;background:#080808;color:#fff;font-family:Arial,sans-serif}
-header{height:55px;display:flex;align-items:center;justify-content:center;background:#111;position:sticky;top:0;z-index:5}
-header b{color:#ff3155;font-size:22px}
-.tabs{display:flex;justify-content:center;gap:24px;padding:14px;background:#111}
-.tabs button,nav button{background:none;border:0;color:white;font-size:14px;cursor:pointer}
-.tabs button.active{border-bottom:3px solid #ff3155;padding-bottom:8px}
-main{padding-bottom:70px}
-#feed{height:calc(100dvh - 170px);min-height:420px;overflow-y:auto;scroll-snap-type:y mandatory}
-.video-card{height:calc(100dvh - 170px);min-height:420px;position:relative;background:#181818;scroll-snap-align:start;overflow:hidden}
-.video-card video{width:100%;height:100%;position:absolute;inset:0;object-fit:contain;background:#080808}
-.info{position:absolute;bottom:20px;left:12px;right:78px;text-shadow:0 1px 4px #000;overflow-wrap:anywhere}
-.info p{margin:8px 0}
-.actions{position:absolute;right:10px;bottom:28px;display:grid;gap:14px}
-.actions button{background:#222b;color:white;border:0;border-radius:20px;padding:10px;cursor:pointer}
-.page{display:none;min-height:calc(100dvh - 125px);padding:18px}
-.page.active{display:block}
-#discoverGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px}
-.tile{background:#222;border-radius:8px;padding:12px;min-height:80px;overflow-wrap:anywhere;color:white}
-input,textarea{width:100%;padding:12px;margin:8px 0;background:#222;color:white;border:1px solid #555;border-radius:8px}
-.primary{padding:12px 16px;background:#ff3155;color:white;border:0;border-radius:8px;cursor:pointer}
-.primary:disabled{opacity:.55}
-nav{position:fixed;bottom:0;left:0;right:0;background:#111;border-top:1px solid #333;display:flex;justify-content:space-around;padding:10px 2px;z-index:8}
-nav button{font-size:12px;padding:5px}
-nav button.selected{color:#ff3155}
-#preview{width:100%;max-height:300px;margin-top:12px;background:#000}
-.muted{color:#bbb;font-size:14px;line-height:1.5}
-#kt-account{background:#171717;color:white;padding:20px;margin:16px 16px 90px;border-radius:16px}
-#kt-account button{cursor:pointer}
-#kt-account .account-button{padding:12px;border:0;border-radius:8px;margin:5px 3px 5px 0}
-#kt-status,#uploadStatus{overflow-wrap:anywhere;line-height:1.5}
-#kt-profile[hidden]{display:none}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>KenyaTok – Warm Kenyan Vibes</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --kenya-red: #BB0000;
+      --kenya-green: #006600;
+      --kenya-black: #000000;
+      --warm-bg: #1a120b;
+      --warm-card: #2a1f15;
+      --warm-accent: #e67e22;
+      --warm-text: #f5e6d3;
+      --soft-orange: #f39c12;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background: var(--warm-bg);
+      color: var(--warm-text);
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 240px;
+      background: linear-gradient(180deg, #2a1f15 0%, #1a120b 100%);
+      border-right: 1px solid rgba(230, 126, 34, 0.2);
+      display: flex;
+      flex-direction: column;
+      padding: 20px 12px;
+      z-index: 100;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 30px;
+      padding: 0 8px;
+    }
+
+    .logo-icon {
+      width: 42px;
+      height: 42px;
+      background: linear-gradient(135deg, var(--kenya-red), var(--soft-orange));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      font-weight: 700;
+      color: white;
+    }
+
+    .logo-text {
+      font-size: 22px;
+      font-weight: 700;
+      background: linear-gradient(90deg, var(--kenya-red), var(--soft-orange));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 16px;
+      border-radius: 12px;
+      margin-bottom: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-weight: 500;
+      color: #d4c4b0;
+    }
+
+    .nav-item:hover, .nav-item.active {
+      background: rgba(230, 126, 34, 0.15);
+      color: var(--soft-orange);
+    }
+
+    .nav-item.active {
+      border-left: 3px solid var(--kenya-red);
+    }
+
+    .nav-icon {
+      font-size: 22px;
+      width: 28px;
+      text-align: center;
+    }
+
+    /* Main Feed */
+    .main {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .video-container {
+      height: 100vh;
+      overflow-y: scroll;
+      scroll-snap-type: y mandatory;
+      scrollbar-width: none;
+    }
+
+    .video-container::-webkit-scrollbar {
+      display: none;
+    }
+
+    .video-card {
+      height: 100vh;
+      scroll-snap-align: start;
+      position: relative;
+      display: flex;
+      background: #111;
+    }
+
+    .video-bg {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      filter: brightness(0.85);
+    }
+
+    .video-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 40%, transparent 70%, rgba(0,0,0,0.3) 100%);
+    }
+
+    /* Right side actions */
+    .actions {
+      position: absolute;
+      right: 16px;
+      bottom: 120px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 22px;
+      z-index: 10;
+    }
+
+    .action-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      transition: transform 0.15s;
+    }
+
+    .action-btn:active {
+      transform: scale(0.9);
+    }
+
+    .action-icon {
+      width: 52px;
+      height: 52px;
+      background: rgba(0,0,0,0.4);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      backdrop-filter: blur(4px);
+      border: 1px solid rgba(255,255,255,0.15);
+    }
+
+    .action-count {
+      font-size: 13px;
+      font-weight: 600;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+    }
+
+    .like-btn.liked .action-icon {
+      background: var(--kenya-red);
+      animation: heartBeat 0.4s;
+    }
+
+    @keyframes heartBeat {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.3); }
+      100% { transform: scale(1); }
+    }
+
+    /* Bottom info */
+    .video-info {
+      position: absolute;
+      left: 16px;
+      bottom: 100px;
+      right: 90px;
+      z-index: 10;
+    }
+
+    .user-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: 2px solid var(--soft-orange);
+      object-fit: cover;
+    }
+
+    .username {
+      font-weight: 600;
+      font-size: 17px;
+    }
+
+    .follow-btn {
+      background: var(--kenya-red);
+      color: white;
+      border: none;
+      padding: 6px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .follow-btn:hover {
+      background: #990000;
+    }
+
+    .follow-btn.following {
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.4);
+    }
+
+    .caption {
+      font-size: 15px;
+      line-height: 1.4;
+      margin-bottom: 8px;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+    }
+
+    .music {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    .music-icon {
+      animation: spin 4s linear infinite;
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    /* Bottom navigation (mobile style) */
+    .bottom-nav {
+      position: absolute;
+      bottom: 0;
+      left: 240px;
+      right: 0;
+      height: 70px;
+      background: rgba(26, 18, 11, 0.95);
+      backdrop-filter: blur(12px);
+      border-top: 1px solid rgba(230, 126, 34, 0.2);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      z-index: 50;
+    }
+
+    .bottom-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      color: #a89078;
+      font-size: 11px;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+
+    .bottom-item.active {
+      color: var(--soft-orange);
+    }
+
+    .bottom-item .icon {
+      font-size: 24px;
+    }
+
+    .create-btn {
+      width: 52px;
+      height: 36px;
+      background: linear-gradient(90deg, var(--kenya-red), var(--kenya-green));
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      color: white;
+      margin-top: -8px;
+      box-shadow: 0 4px 15px rgba(187, 0, 0, 0.4);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .sidebar {
+        display: none;
+      }
+      .bottom-nav {
+        left: 0;
+      }
+    }
+
+    /* Progress bar at top of each video */
+    .progress {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 3px;
+      background: var(--soft-orange);
+      width: 0%;
+      z-index: 20;
+      transition: width 0.1s linear;
+    }
+  </style>
 </head>
 <body>
-<header><b>KenyaTik 🇰🇪</b></header>
-<div class="tabs" id="feedTabs">
-<button id="followingTab" onclick="showFollowing()">Following</button>
-<button id="forYouTab" class="active" onclick="showForYou()">For You</button>
-</div>
-<main>
-<section id="homePage" class="page active" style="padding:0">
-  <div id="feed">
-    <article class="video-card" data-caption="Welcome to KenyaTik! Our first sample video.">
-      <video src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4" muted loop playsinline controls></video>
-      <div class="info"><b>@KenyaTik</b><p>Welcome to KenyaTik 🇰🇪</p><span>♪ Sample video</span></div>
-      <div class="actions">
-        <button onclick="toggleLike(this)">♥ <span>0</span></button>
-        <button onclick="toggleSound(this)">🔇 Sound</button>
-        <button onclick="sharePage()">↗ Share</button>
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="logo-icon">KT</div>
+      <div class="logo-text">KenyaTok</div>
+    </div>
+
+    <div class="nav-item active">
+      <span class="nav-icon">🏠</span>
+      <span>For You</span>
+    </div>
+    <div class="nav-item">
+      <span class="nav-icon">🔥</span>
+      <span>Trending</span>
+    </div>
+    <div class="nav-item">
+      <span class="nav-icon">🎵</span>
+      <span>Music</span>
+    </div>
+    <div class="nav-item">
+      <span class="nav-icon">👥</span>
+      <span>Following</span>
+    </div>
+    <div class="nav-item">
+      <span class="nav-icon">📍</span>
+      <span>Near Me</span>
+    </div>
+    <div class="nav-item">
+      <span class="nav-icon">💬</span>
+      <span>Inbox</span>
+    </div>
+    <div class="nav-item">
+      <span class="nav-icon">👤</span>
+      <span>Profile</span>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main">
+    <div class="video-container" id="feed">
+      <!-- Videos will be injected here -->
+    </div>
+
+    <!-- Bottom Nav -->
+    <nav class="bottom-nav">
+      <div class="bottom-item active">
+        <span class="icon">🏠</span>
+        <span>Home</span>
       </div>
-    </article>
-    <article class="video-card" data-caption="Enjoy this sample clip. More videos coming soon.">
-      <video src="https://www.w3schools.com/html/mov_bbb.mp4" muted loop playsinline controls></video>
-      <div class="info"><b>@KenyaTik Clips</b><p>Enjoy this sample clip 🇰🇪</p><span>♪ Sample video</span></div>
-      <div class="actions">
-        <button onclick="toggleLike(this)">♥ <span>0</span></button>
-        <button onclick="toggleSound(this)">🔇 Sound</button>
-        <button onclick="sharePage()">↗ Share</button>
+      <div class="bottom-item">
+        <span class="icon">🔍</span>
+        <span>Discover</span>
       </div>
-    </article>
-  </div>
-</section>
-<section id="discoverPage" class="page">
-  <h2>Discover</h2><p class="muted">Search video captions and creators.</p>
-  <input id="searchBox" placeholder="Search videos..." oninput="searchVideos()">
-  <div id="discoverGrid"></div>
-</section>
-<section id="createPage" class="page">
-  <h2>Create a video</h2>
-  <p class="muted">Sign in first, then select a video up to 50 MB. Accepted formats depend on your phone and browser.</p>
-  <label for="videoFile">Choose video</label>
-  <input id="videoFile" type="file" accept="video/mp4,video/webm,video/quicktime,video/*">
-  <label for="videoCaption">Caption (optional)</label>
-  <input id="videoCaption" maxlength="180" placeholder="Write a caption...">
-  <video id="preview" controls playsinline style="display:none"></video>
-  <button id="uploadButton" class="primary" onclick="uploadVideo()">Upload video</button>
-  <p id="uploadStatus" class="muted" role="status" aria-live="polite">No video uploaded yet.</p>
-</section>
-<section id="inboxPage" class="page">
-  <h2>Inbox</h2><div class="tile">📬 Welcome to KenyaTik!</div>
-  <p class="muted">Notifications and messages will be added later.</p>
-</section>
-<section id="profilePage" class="page">
-  <h2>Your Profile</h2><div class="tile"><h3 id="feedProfileName">@KenyaTikUser</h3>
-  <p id="videoCount">Videos in the feed will appear here.</p>
-  <p class="muted">Account details are shown in the account panel below.</p></div>
-</section>
-</main>
-<nav>
-<button class="selected" data-page="homePage" onclick="openPage('homePage',this)">⌂<br>Home</button>
-<button data-page="discoverPage" onclick="openPage('discoverPage',this)">⌕<br>Discover</button>
-<button data-page="createPage" onclick="openPage('createPage',this)">＋<br>Create</button>
-<button data-page="inboxPage" onclick="openPage('inboxPage',this)">✉<br>Inbox</button>
-<button data-page="profilePage" onclick="openPage('profilePage',this)">♙<br>Profile</button>
-</nav>
-<section id="kt-account">
-<h2 style="color:#45e6a5">🇰🇪 KenyaTik Account</h2>
-<p>Create an account or sign in to your profile.</p>
-<label for="kt-username">Username (new accounts)</label>
-<input id="kt-username" placeholder="e.g. NairobiCreator" maxlength="30" autocomplete="username">
-<label for="kt-email">Email address</label>
-<input id="kt-email" type="email" placeholder="you@example.com" autocomplete="email">
-<label for="kt-password">Password</label>
-<input id="kt-password" type="password" minlength="8" placeholder="At least 8 characters" autocomplete="current-password">
-<button id="kt-signup" class="account-button" style="background:#45e6a5;color:#111;font-weight:bold">Create account</button>
-<button id="kt-login" class="account-button" style="background:white;color:#111">Log in</button>
-<button id="kt-logout" class="account-button" style="display:none;background:#333;color:white">Log out</button>
-<p id="kt-status" role="status" aria-live="polite">Connecting to KenyaTik accounts...</p>
-<div id="kt-profile" hidden><h3>Your profile</h3><p id="kt-profile-name"></p></div>
-</section>
-<script>
-"use strict";
+      <div class="bottom-item">
+        <div class="create-btn">+</div>
+      </div>
+      <div class="bottom-item">
+        <span class="icon">💬</span>
+        <span>Inbox</span>
+      </div>
+      <div class="bottom-item">
+        <span class="icon">👤</span>
+        <span>Me</span>
+      </div>
+    </nav>
+  </main>
 
-/* SUPABASE SETTINGS: use your project's public publishable key, never a service-role key. */
-const SUPABASE_URL = "https://tyljepyqlesaeugiutju.supabase.co";
-const SUPABASE_KEY = "sb_publishable_MvfzOlmfQ-jdHBArvG4wrA_VLjyan4E";
-let client = null;
-let currentUser = null;
-let previewUrl = null;
-let observer = null;
+  <script>
+    // Sample Kenyan-themed videos (using gradient backgrounds + emoji for demo)
+    const videos = [
+      {
+        id: 1,
+        user: "@nairobi_vibes",
+        avatar: "https://i.pravatar.cc/150?img=11",
+        caption: "Sunday vibes in Nairobi 🌅 Karibu Kenya! Who else loves this weather? #Nairobi #KenyaTok",
+        music: "Benga Beats – Original Sound",
+        likes: "24.5K",
+        comments: "1.2K",
+        shares: "890",
+        bg: "linear-gradient(135deg, #c0392b, #e67e22, #f1c40f)"
+      },
+      {
+        id: 2,
+        user: "@mombasa_queen",
+        avatar: "https://i.pravatar.cc/150?img=5",
+        caption: "Swahili coast magic 🌴🌊 Fresh coconut water hits different! #Mombasa #CoastLife",
+        music: "Taarab Vibes – Coast Sounds",
+        likes: "18.9K",
+        comments: "943",
+        shares: "612",
+        bg: "linear-gradient(135deg, #16a085, #27ae60, #2ecc71)"
+      },
+      {
+        id: 3,
+        user: "@maasai_warrior",
+        avatar: "https://i.pravatar.cc/150?img=33",
+        caption: "Traditional Maasai dance in full color ❤️🖤💚 Preserving our culture with pride! #Maasai #Kenya",
+        music: "Maasai Drums – Ancestral Beat",
+        likes: "42.1K",
+        comments: "3.4K",
+        shares: "2.1K",
+        bg: "linear-gradient(135deg, #8e44ad, #c0392b, #e74c3c)"
+      },
+      {
+        id: 4,
+        user: "@safari_king",
+        avatar: "https://i.pravatar.cc/150?img=68",
+        caption: "Sunrise over the Maasai Mara 🦁 Nothing compares to Kenya’s wild beauty #Safari #BigFive",
+        music: "Wildlife Ambience – Nature Sounds",
+        likes: "67.3K",
+        comments: "4.8K",
+        shares: "5.2K",
+        bg: "linear-gradient(135deg, #d35400, #e67e22, #f39c12)"
+      },
+      {
+        id: 5,
+        user: "@nairobi_chef",
+        avatar: "https://i.pravatar.cc/150?img=20",
+        caption: "Making the perfect chapati + nyama choma combo 🔥 Who wants the recipe? #KenyanFood #Chapati",
+        music: "Kitchen Beats – Cooking Vibes",
+        likes: "31.7K",
+        comments: "2.9K",
+        shares: "1.8K",
+        bg: "linear-gradient(135deg, #c0392b, #e74c3c, #e67e22)"
+      }
+    ];
 
-const $ = id => document.getElementById(id);
-const feed = $("feed");
+    const feed = document.getElementById('feed');
 
-function setAccountStatus(message) { $("kt-status").textContent = message; }
-function setUploadStatus(message) { $("uploadStatus").textContent = message; }
+    // Render videos
+    videos.forEach((video, index) => {
+      const card = document.createElement('div');
+      card.className = 'video-card';
+      card.innerHTML = `
+        <div class="progress" id="progress-${video.id}"></div>
+        <div class="video-bg" style="background: ${video.bg}"></div>
+        <div class="video-overlay"></div>
 
-function openPage(id, button) {
-  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
-  $(id).classList.add("active");
-  document.querySelectorAll("nav button").forEach(b => b.classList.remove("selected"));
-  if (button) button.classList.add("selected");
-  $("feedTabs").style.display = id === "homePage" ? "flex" : "none";
-  document.querySelectorAll("#feed video").forEach(v => { if (!v.paused) v.pause(); });
-  if (id === "discoverPage") searchVideos();
-}
-function showForYou() {
-  $("forYouTab").classList.add("active");
-  $("followingTab").classList.remove("active");
-  document.querySelectorAll(".video-card").forEach(card => card.style.display = "");
-}
-function showFollowing() {
-  $("followingTab").classList.add("active");
-  $("forYouTab").classList.remove("active");
-  alert("Following feed is not available yet. Choose For You to see videos.");
-}
-function toggleLike(button) {
-  const count = button.querySelector("span");
-  const liked = button.dataset.liked !== "yes";
-  button.dataset.liked = liked ? "yes" : "no";
-  count.textContent = String(Math.max(0, Number(count.textContent) + (liked ? 1 : -1)));
-  button.style.color = liked ? "#ff3155" : "white";
-}
-function toggleSound(button) {
-  const video = button.closest(".video-card").querySelector("video");
-  video.muted = !video.muted;
-  button.textContent = video.muted ? "🔇 Sound" : "🔊 Sound";
-  if (!video.paused) video.play().catch(() => {});
-}
-function sharePage() {
-  if (navigator.share) navigator.share({title:"KenyaTik",url:location.href}).catch(() => {});
-  else prompt("Copy your KenyaTik website link:", location.href);
-}
+        <div class="actions">
+          <div class="action-btn like-btn" onclick="toggleLike(this)">
+            <div class="action-icon">❤️</div>
+            <span class="action-count">${video.likes}</span>
+          </div>
+          <div class="action-btn">
+            <div class="action-icon">💬</div>
+            <span class="action-count">${video.comments}</span>
+          </div>
+          <div class="action-btn">
+            <div class="action-icon">↪️</div>
+            <span class="action-count">${video.shares}</span>
+          </div>
+          <div class="action-btn">
+            <div class="action-icon">📌</div>
+            <span class="action-count">Save</span>
+          </div>
+        </div>
 
-function makeCard(row) {
-  const card = document.createElement("article");
-  card.className = "video-card";
-  card.dataset.caption = row.caption || "";
-  const video = document.createElement("video");
-  video.src = row.video_url;
-  video.controls = true;
-  video.loop = true;
-  video.playsInline = true;
-  video.muted = true;
-  const info = document.createElement("div");
-  info.className = "info";
-  const author = document.createElement("b");
-  author.textContent = "@" + (row.username || "KenyaTikCreator");
-  const caption = document.createElement("p");
-  caption.textContent = row.caption || "My KenyaTik video 🇰🇪";
-  info.append(author, caption);
-  const actions = document.createElement("div");
-  actions.className = "actions";
-  const like = document.createElement("button");
-  like.innerHTML = "♥ <span>0</span>";
-  like.onclick = () => toggleLike(like);
-  const sound = document.createElement("button");
-  sound.textContent = "🔇 Sound";
-  sound.onclick = () => toggleSound(sound);
-  const share = document.createElement("button");
-  share.textContent = "↗ Share";
-  share.onclick = sharePage;
-  actions.append(like, sound, share);
-  card.append(video, info, actions);
-  return card;
-}
-
-async function loadVideos() {
-  if (!client) return;
-  const {data, error} = await client
-    .from("videos")
-    .select("id,user_id,video_url,caption,created_at")
-    .order("created_at", {ascending:false})
-    .limit(50);
-  if (error) {
-    console.warn("Could not load uploaded videos:", error.message);
-    return;
-  }
-  // Keep the two demo cards, then append uploaded database videos.
-  document.querySelectorAll("#feed .database-video").forEach(el => el.remove());
-  for (const row of (data || []).reverse()) {
-    const card = makeCard(row);
-    card.classList.add("database-video");
-    feed.appendChild(card);
-  }
-  updateVideoCount();
-  searchVideos();
-}
-function updateVideoCount() {
-  $("videoCount").textContent = document.querySelectorAll("#feed .video-card").length + " videos currently shown.";
-}
-function searchVideos() {
-  const grid = $("discoverGrid");
-  const search = $("searchBox");
-  if (!grid || !search) return;
-  const query = search.value.trim().toLowerCase();
-  grid.replaceChildren();
-  const cards = Array.from(document.querySelectorAll("#feed .video-card"));
-  cards.forEach(card => {
-    const text = (card.dataset.caption || "") + " " + (card.querySelector(".info b")?.textContent || "");
-    if (query && !text.toLowerCase().includes(query)) return;
-    const tile = document.createElement("button");
-    tile.className = "tile";
-    tile.style.textAlign = "left";
-    tile.textContent = "▶ " + text;
-    tile.onclick = () => {
-      openPage("homePage", document.querySelector('[data-page="homePage"]'));
-      showForYou();
-      card.scrollIntoView({behavior:"smooth"});
-      const v = card.querySelector("video");
-      v.play().catch(() => {});
-    };
-    grid.appendChild(tile);
-  });
-  if (!grid.children.length) {
-    const empty = document.createElement("p");
-    empty.className = "muted";
-    empty.textContent = "No matching videos found.";
-    grid.appendChild(empty);
-  }
-}
-
-async function uploadVideo() {
-  const file = $("videoFile").files[0];
-  const button = $("uploadButton");
-  const caption = $("videoCaption").value.trim();
-
-  if (!client) return setUploadStatus("Supabase did not start. Refresh the page and try again.");
-  if (!file) return setUploadStatus("Choose a video from your phone first.");
-  if (!file.type.startsWith("video/")) return setUploadStatus("Please select a video file.");
-  if (file.size > 50 * 1024 * 1024) return setUploadStatus("Choose a video smaller than 50 MB.");
-
-  button.disabled = true;
-  try {
-    setUploadStatus("Checking your sign-in...");
-    const {data: authData, error: authError} = await client.auth.getUser();
-    if (authError) throw authError;
-    const user = authData.user;
-    if (!user) {
-      setUploadStatus("Please log in with your KenyaTik email and password first.");
-      openPage("profilePage", document.querySelector('[data-page="profilePage"]'));
-      $("kt-email").focus();
-      return;
-    }
-
-    setUploadStatus("Uploading video to storage...");
-    const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
-    const path = user.id + "/" + Date.now() + "-" + safeName;
-    const {error: storageError} = await client.storage
-      .from("kenyatiktok-videos")
-      .upload(path, file, {contentType:file.type, upsert:false});
-    if (storageError) throw new Error("Storage upload failed: " + storageError.message);
-
-    const {data: publicData} = client.storage.from("kenyatiktok-videos").getPublicUrl(path);
-    const {error: rowError} = await client.from("videos").insert({
-      user_id:user.id,
-      video_url:publicData.publicUrl,
-      caption:caption
-    });
-    if (rowError) {
-      setUploadStatus("The video file uploaded, but its database record failed: " + rowError.message + ". Please tell me this exact message.");
-      return;
-    }
-
-    $("videoFile").value = "";
-    $("videoCaption").value = "";
-    if (previewUrl) URL.revokeObjectURL(previewUrl);
-    $("preview").removeAttribute("src");
-    $("preview").style.display = "none";
-    setUploadStatus("Upload successful! Your video is saved and loading into the feed.");
-    await loadVideos();
-    openPage("homePage", document.querySelector('[data-page="homePage"]'));
-    showForYou();
-    const firstNew = document.querySelector("#feed .database-video");
-    if (firstNew) firstNew.scrollIntoView({behavior:"smooth"});
-  } catch (error) {
-    console.error(error);
-    setUploadStatus("Upload failed: " + (error?.message || String(error)));
-  } finally {
-    button.disabled = false;
-  }
-}
-
-function previewSelectedVideo() {
-  const file = $("videoFile").files[0];
-  if (!file) return;
-  if (!file.type.startsWith("video/")) return setUploadStatus("Please select a video file.");
-  if (file.size > 50 * 1024 * 1024) return setUploadStatus("Choose a video smaller than 50 MB.");
-  if (previewUrl) URL.revokeObjectURL(previewUrl);
-  previewUrl = URL.createObjectURL(file);
-  $("preview").src = previewUrl;
-  $("preview").style.display = "block";
-  setUploadStatus("Preview ready. Tap Upload video to publish it.");
-}
-$("videoFile").addEventListener("change", previewSelectedVideo);
-
-async function saveAndShowProfile(user) {
-  if (!user || !client) return;
-  const {data: existing, error: readError} = await client
-    .from("profiles").select("id,username").eq("id", user.id).maybeSingle();
-  if (readError) {
-    setAccountStatus("Signed in, but profile lookup failed: " + readError.message);
-    return;
-  }
-  let username = existing?.username;
-  if (!existing) {
-    username = $("kt-username").value.trim() || user.user_metadata?.username || "";
-    if (!/^[A-Za-z0-9_]{3,30}$/.test(username)) {
-      setAccountStatus("Please enter a username of 3–30 letters, numbers or underscores.");
-      return;
-    }
-    const {error: insertError} = await client.from("profiles").insert({id:user.id, username});
-    if (insertError) {
-      setAccountStatus("Signed in, but saving your profile failed: " + insertError.message);
-      return;
-    }
-  }
-  currentUser = user;
-  $("kt-profile-name").textContent = "@" + username;
-  $("feedProfileName").textContent = "@" + username;
-  $("kt-profile").hidden = false;
-  $("kt-logout").style.display = "inline-block";
-  $("kt-signup").style.display = "none";
-  $("kt-login").style.display = "none";
-  $("kt-username").disabled = true;
-  setAccountStatus("You're signed in to KenyaTik!");
-}
-
-async function init() {
-  if (!window.supabase || !window.supabase.createClient) {
-    setAccountStatus("Supabase library failed to load. Check internet and refresh.");
-    return;
-  }
-  try {
-    client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    $("kt-signup").addEventListener("click", async () => {
-      const username = $("kt-username").value.trim();
-      const email = $("kt-email").value.trim();
-      const password = $("kt-password").value;
-      if (!/^[A-Za-z0-9_]{3,30}$/.test(username)) return setAccountStatus("Username must be 3–30 letters, numbers or underscores.");
-      if (!email || password.length < 8) return setAccountStatus("Enter a valid email and a password of at least 8 characters.");
-      $("kt-signup").disabled = true;
-      setAccountStatus("Creating account...");
-      try {
-        const {data, error} = await client.auth.signUp({
-          email, password, options:{emailRedirectTo:location.origin + location.pathname, data:{username}}
-        });
-        if (error) throw error;
-        if (data.session && data.user) await saveAndShowProfile(data.user);
-        else setAccountStatus("Account created/requested. Check your email to confirm, then log in.");
-      } catch (e) { setAccountStatus("Registration failed: " + e.message); }
-      finally { $("kt-signup").disabled = false; }
+        <div class="video-info">
+          <div class="user-row">
+            <img src="\( {video.avatar}" class="avatar" alt=" \){video.user}">
+            <span class="username">${video.user}</span>
+            <button class="follow-btn" onclick="toggleFollow(this)">Follow</button>
+          </div>
+          <p class="caption">${video.caption}</p>
+          <div class="music">
+            <span class="music-icon">🎵</span>
+            <span>${video.music}</span>
+          </div>
+        </div>
+      `;
+      feed.appendChild(card);
     });
 
-    $("kt-login").addEventListener("click", async () => {
-      const email = $("kt-email").value.trim();
-      const password = $("kt-password").value;
-      if (!email || !password) return setAccountStatus("Enter your email and password.");
-      $("kt-login").disabled = true;
-      setAccountStatus("Signing in...");
-      try {
-        const {data, error} = await client.auth.signInWithPassword({email, password});
-        if (error) throw error;
-        await saveAndShowProfile(data.user);
-        await loadVideos();
-      } catch (e) { setAccountStatus("Login failed: " + e.message); }
-      finally { $("kt-login").disabled = false; }
-    });
-
-    $("kt-logout").addEventListener("click", async () => {
-      $("kt-logout").disabled = true;
-      try {
-        const {error} = await client.auth.signOut();
-        if (error) throw error;
-        currentUser = null;
-        $("kt-profile").hidden = true;
-        $("kt-logout").style.display = "none";
-        $("kt-signup").style.display = "inline-block";
-        $("kt-login").style.display = "inline-block";
-        $("kt-username").disabled = false;
-        setAccountStatus("You have logged out.");
-      } catch (e) { setAccountStatus("Could not log out: " + e.message); }
-      finally { $("kt-logout").disabled = false; }
-    });
-
-    const {data, error} = await client.auth.getSession();
-    if (error) setAccountStatus("Could not check session: " + error.message);
-    else if (data.session) {
-      await saveAndShowProfile(data.session.user);
-      await loadVideos();
-    } else {
-      setAccountStatus("Ready. Create an account or log in.");
-      await loadVideos();
+    // Like toggle
+    function toggleLike(btn) {
+      btn.classList.toggle('liked');
+      const count = btn.querySelector('.action-count');
+      if (btn.classList.contains('liked')) {
+        // simple visual feedback
+        count.style.color = '#ff4757';
+      } else {
+        count.style.color = '';
+      }
     }
-  } catch (e) {
-    setAccountStatus("Could not start Supabase
+
+    // Follow toggle
+    function toggleFollow(btn) {
+      if (btn.classList.contains('following')) {
+        btn.classList.remove('following');
+        btn.textContent = 'Follow';
+      } else {
+        btn.classList.add('following');
+        btn.textContent = 'Following';
+      }
+    }
+
+    // Simple progress bar animation for the current video
+    let currentIndex = 0;
+    const cards = document.querySelectorAll('.video-card');
+
+    function updateProgress() {
+      cards.forEach((card, i) => {
+        const progress = card.querySelector('.progress');
+        if (i === currentIndex) {
+          progress.style.width = '100%';
+          progress.style.transition = 'width 8s linear';
+        } else {
+          progress.style.width = '0%';
+          progress.style.transition = 'none';
+        }
+      });
+    }
+
+    // Detect which video is in view
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          currentIndex = Array.from(cards).indexOf(entry.target);
+          updateProgress();
+        }
+      });
+    }, { threshold: 0.6 });
+
+    cards.forEach(card => observer.observe(card));
+
+    // Start first progress
+    updateProgress();
+  </script>
+</body>
+</html>
