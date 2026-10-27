@@ -435,3 +435,10 @@ async function init() {
     }
   } catch (e) {
     setAccountStatus("Could not start Supabase
+    setAccountStatus("Could not start Supabase: " + e.message);
+  }
+}
+init();
+</script>
+</body>
+</html>
