@@ -324,6 +324,7 @@ searchVideos();
   let client;
   try {
     client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    window.kenyaTikClient = client;
   } catch (error) {
     showStatus("Could not start accounts: " + error.message);
     return;
