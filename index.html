@@ -37,6 +37,59 @@ $("accountShortcut").onclick=()=>go("account");$("profileLogin").onclick=()=>go(
 document.querySelectorAll("[data-feed]").forEach(b=>b.onclick=()=>{feedMode=b.dataset.feed;document.querySelectorAll("[data-feed]").forEach(x=>x.classList.toggle("selected",x===b));renderFeed()});
 function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 function createPost(v){const p=document.createElement("article");p.className="post";p.dataset.id=v.id;if(v.video_url){const vid=document.createElement("video");vid.src=v.video_url;vid.autoplay=true;vid.loop=true;vid.muted=true;vid.playsInline=true;vid.preload="metadata";vid.onclick=()=>vid.muted=!vid.muted;p.appendChild(vid)}else{const d=document.createElement("div");d.className="demo";d.innerHTML="KENYATIK<br><span style='font-size:20px'>🇰🇪</span>";p.appendChild(d)}const sh=document.createElement("div");sh.className="shade";p.appendChild(sh);const m=document.createElement("div");m.className="meta";m.innerHTML="<b>@"+esc(v.username||"KenyaTikCreator")+"</b><p>"+esc(v.caption||"")+"</p>"+(v.video_url?"<small>Tap video to toggle sound</small>":"<small>Demo card · use Create to upload a real video</small>");p.appendChild(m);const r=document.createElement("div");r.className="rail";r.innerHTML='<button data-a="like"><strong>♡</strong><span>0</span></button><button data-a="comment"><strong>☏</strong><span>Comment</span></button><button data-a="share"><strong>↗</strong><span>Share</span></button>';p.appendChild(r);r.querySelector('[data-a="like"]').onclick=e=>{let b=e.currentTarget;b.classList.toggle("liked");b.querySelector("span").textContent=b.classList.contains("liked")?"1":"0"};r.querySelector('[data-a="comment"]').onclick=()=>alert("Comments are not connected yet.");r.querySelector('[data-a="share"]').onclick=async()=>{try{if(navigator.share)await navigator.share({title:"KenyaTik",text:v.caption||"KenyaTik video",url:location.href});else{await navigator.clipboard.writeText(location.href);alert("Page link copied.")}}catch(e){}};return p}
+  
+async function loadFollowingVideos(){
+  if(!client || !currentUser){
+    status("searchStatus","Log in to see videos from creators you follow.");
+    return [];
+  }
+
+  try{
+    const {data:follows,error:followError}=await client
+      .from("follows")
+      .select("creator_id")
+      .eq("follower_id",currentUser.id);
+
+    if(followError) throw followError;
+
+    const creatorIds=[...new Set((follows||[])
+      .map(f=>f.creator_id)
+      .filter(id=>id && id!==currentUser.id))];
+
+    if(!creatorIds.length) return [];
+
+    const {data:rows,error:videoError}=await client
+      .from("videos")
+      .select("id,user_id,video_url,caption,created_at")
+      .in("user_id",creatorIds)
+      .order("created_at",{ascending:false})
+      .limit(100);
+
+    if(videoError) throw videoError;
+
+    const ids=[...new Set((rows||[]).map(v=>v.user_id).filter(Boolean))];
+    const names={};
+
+    if(ids.length){
+      const {data:profiles}=await client
+        .from("profiles")
+        .select("id,username")
+        .in("id",ids);
+
+      (profiles||[]).forEach(p=>names[p.id]=p.username);
+    }
+
+    return (rows||[]).map(v=>({
+      ...v,
+      username:names[v.user_id]||"KenyaTikCreator"
+    }));
+  }catch(e){
+    console.error("Following feed:",e);
+    status("searchStatus","Following feed error: "+e.message,true);
+    return [];
+  }
+}
+  
 function renderFeed(){const f=$("feed");f.replaceChildren();if(feedMode==="following"){f.innerHTML='<div class="empty"><b>Following</b><p>Creator following is not connected yet.</p><button id="allVideos">See all videos</button></div>';$("allVideos").onclick=()=>{feedMode="for-you";document.querySelectorAll("[data-feed]").forEach(b=>b.classList.toggle("selected",b.dataset.feed==="for-you"));renderFeed()};return}(videos.length?videos:demos).forEach(v=>f.appendChild(createPost(v)))}
 async function loadVideos(){if(!client){renderFeed();return}try{const {data,error}=await client.from("videos").select("id,user_id,video_url,caption,created_at").order("created_at",{ascending:false}).limit(100);if(error)throw error;let rows=data||[],names={};const ids=[...new Set(rows.map(v=>v.user_id).filter(Boolean))];if(ids.length){const {data:ps}=await client.from("profiles").select("id,username").in("id",ids);(ps||[]).forEach(p=>names[p.id]=p.username)}videos=rows.map(v=>({...v,username:names[v.user_id]||"KenyaTikCreator"}));renderFeed();renderDiscover();renderProfile()}catch(e){console.error(e);videos=[];renderFeed();status("searchStatus","Could not load videos: "+e.message,true)}}
 async function loadProfile(){profile=null;if(!client||!currentUser)return;try{const {data,error}=await client.from("profiles").select("id,username").eq("id",currentUser.id).maybeSingle();if(error)throw error;profile=data}catch(e){console.warn("Profile lookup:",e.message)}}
