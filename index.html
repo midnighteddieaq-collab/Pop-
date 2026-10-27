@@ -254,29 +254,145 @@ function searchVideos() {
 }
 
 function previewVideo() {
+
+async function previewVideo() {
   const file = document.getElementById("videoFile").files[0];
   const status = document.getElementById("uploadStatus");
   const preview = document.getElementById("preview");
+  const caption = document.getElementById("videoCaption").value.trim();
+  const button = document.querySelector("#createPage .primary");
+  const client = window.kenyaTikClient;
 
   if (!file) {
     status.textContent = "Choose a video from your phone first.";
     return;
   }
+
   if (!file.type.startsWith("video/")) {
     status.textContent = "Please select a video file.";
     return;
   }
+
   if (file.size > 50 * 1024 * 1024) {
     status.textContent = "Choose a video smaller than 50 MB.";
     return;
   }
 
-  if (previewUrl) URL.revokeObjectURL(previewUrl);
-  previewUrl = URL.createObjectURL(file);
-  preview.src = previewUrl;
-  preview.style.display = "block";
-  status.textContent = "Local preview only. This video has not been uploaded.";
+  if (!client) {
+    status.textContent = "Account system unavailable. Refresh and try again.";
+    return;
+  }
+
+  button.disabled = true;
+  status.textContent = "Checking your account...";
+
+  try {
+    const { data: userData, error: userError } =
+      await client.auth.getUser();
+
+    if (userError) throw userError;
+
+    const user = userData.user;
+
+    if (!user) {
+      status.textContent = "Please log in using your KenyaTik account first.";
+      return;
+    }
+
+    status.textContent = "Uploading video. Please wait...";
+
+    const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+    const filePath = user.id + "/" + Date.now() + "-" + safeName;
+
+    const { error: uploadError } = await client.storage
+      .from("kenyatiktok-videos")
+      .upload(filePath, file, {
+        contentType: file.type,
+        upsert: false
+      });
+
+    if (uploadError) throw uploadError;
+
+    const { data: urlData } = client.storage
+      .from("kenyatiktok-videos")
+      .getPublicUrl(filePath);
+
+    const videoUrl = urlData.publicUrl;
+
+    const { error: insertError } = await client
+      .from("videos")
+      .insert({
+        user_id: user.id,
+        video_url: videoUrl,
+        caption: caption
+      });
+
+    if (insertError) {
+      throw new Error(
+        "Video uploaded, but saving its details failed: " +
+        insertError.message
+      );
+    }
+
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    previewUrl = URL.createObjectURL(file);
+    preview.src = previewUrl;
+    preview.style.display = "block";
+
+    const card = document.createElement("article");
+    card.className = "video-card";
+    card.dataset.caption = caption;
+
+    const video = document.createElement("video");
+    video.src = videoUrl;
+    video.loop = true;
+    video.playsInline = true;
+    video.muted = true;
+
+    const info = document.createElement("div");
+    info.className = "info";
+
+    const author = document.createElement("b");
+    author.textContent =
+      "@" + (user.user_metadata?.username || "KenyaTikCreator");
+
+    const description = document.createElement("p");
+    description.textContent = caption || "My new KenyaTik video 🇰🇪";
+
+    info.append(author, description);
+
+    const actions = document.createElement("div");
+    actions.className = "actions";
+
+    const like = document.createElement("button");
+    like.innerHTML = "♥ <span>0</span>";
+    like.onclick = () => toggleLike(like);
+
+    const sound = document.createElement("button");
+    sound.textContent = "🔇 Sound";
+    sound.onclick = () => toggleSound(sound);
+
+    const share = document.createElement("button");
+    share.textContent = "↗ Share";
+    share.onclick = () => sharePage();
+
+    actions.append(like, sound, share);
+    card.append(video, info, actions);
+    feed.prepend(card);
+    cards.unshift(card);
+    observer.observe(card);
+    searchVideos();
+
+    document.getElementById("videoFile").value = "";
+    document.getElementById("videoCaption").value = "";
+    status.textContent = "Video uploaded successfully! It is now in your feed.";
+  } catch (error) {
+    status.textContent = "Upload failed: " + error.message;
+  } finally {
+    button.disabled = false;
+  }
 }
+  
 
 const observer = new IntersectionObserver(entries => {
   entries.forEach(entry => {
